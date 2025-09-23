@@ -21,7 +21,6 @@
 // 函数声明
 void TB6612_Init(void);                    // TB6612初始化
 void Motor_SetDirection(uint8_t motor, uint8_t direction);  // 设置电机方向
-void Motor_SetSpeed(uint8_t motor, uint16_t speed);         // 设置电机速度
 void Motor_Forward(int left_speed, int right_speed);  // 前进
 void Motor_Backward(int left_speed, int right_speed); // 后退
 void Motor_LeftTurn(uint16_t speed);       // 左转

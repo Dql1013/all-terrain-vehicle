@@ -90,29 +90,6 @@ void Motor_SetDirection(uint8_t motor, uint8_t direction)
 }
 
 /**
-  * 函    数：设置电机速度
-  * 参    数：motor - 电机编号（MOTOR_LEFT/MOTOR_RIGHT）
-  *           speed - 速度值（0-1000）
-  * 返 回 值：无
-  * 功    能：通过PWM控制电机速度
-  */
-void Motor_SetSpeed(uint8_t motor, uint16_t speed)
-{
-    // 限制速度范围
-    if (speed > 1000) speed = 1000;
-    
-    // 分别设置左右电机速度
-    if (motor == MOTOR_LEFT)
-    {
-        Set_PWM(speed, 0);
-    }
-    else if (motor == MOTOR_RIGHT)
-    {
-        Set_PWM(0, speed);
-    }
-}
-
-/**
   * 函    数：小车前进
   * 参    数：left_speed - 左电机速度
   *           right_speed - 右电机速度
@@ -148,7 +125,7 @@ void Motor_LeftTurn(uint16_t speed)
 {
     Motor_SetDirection(MOTOR_LEFT, 0);   // 左电机停止
     Motor_SetDirection(MOTOR_RIGHT, 1);  // 右电机前进
-    Set_PWM(0, 9000);                    // 设置PWM占空比：左轮0，右轮9000
+    Set_PWM(0, speed);                    // 设置PWM占空比：左轮0，右轮9000
 }
 
 /**
@@ -161,7 +138,7 @@ void Motor_RightTurn(uint16_t speed)
 {
     Motor_SetDirection(MOTOR_LEFT, 1);   // 左电机前进
     Motor_SetDirection(MOTOR_RIGHT, 0);  // 右电机停止
-    Set_PWM(9000, 0);                    // 设置PWM占空比：左轮9000，右轮0
+    Set_PWM(speed, 0);                    // 设置PWM占空比：左轮9000，右轮0
 }
 
 /**

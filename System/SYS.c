@@ -19,6 +19,7 @@
 
 #include "SYS.h"
 
+
 // 全局变量定义
 uint16_t CrossAndBlackAreaCount = 0;  // 黑区计数变量
 uint8_t MAP_count = 0;                // 地图计数
@@ -90,7 +91,7 @@ void STM32_System_Init(void)
 //    Key_Init();         // 按键初始化
 //    Encoder_Init();     // 编码器初始化
     TB6612_Init();      // 电机驱动初始化
-//    OLED_Init();        // OLED显示初始化
+    OLED_Init();        // OLED显示初始化
     // 在STM32_System_Init函数中取消注释
     Tracks_Init();      // 循迹传感器初始化
 //    UserTasks_Init();   // 用户任务初始化
@@ -107,11 +108,11 @@ void STM32_System_Init(void)
   */
 void haixinbei(void)
 {
-	
+	oled_show();
   //伸腿
 
 //	Motor3_Control(MOTOR3_EXTEND);
-	Motor_Forward(400,400);
+//	Motor_Forward(400,400);
 ////	Delay_ms(1000);
 //	Car_Stop();
 //  static uint8_t haixinbei_flag = 0;
@@ -137,12 +138,12 @@ void haixinbei(void)
           break;
       case TRACKS_LEFT_TURN://怎么识别不出来
           // 左转 - 左轮停，右轮转
-//          Motor_RightTurn(9000);
+          Motor_RightTurn(9000);
 		  Motor_Forward(0, 0);
           break;
       case TRACKS_RIGHT_TURN:
           // 右转 - 右轮停，左轮转
-          Motor_LeftTurn(9000);
+          Motor_Forward(0, 0);
           break;
       case TRACKS_CROSSROAD:
           // 十字路口，可以根据需要处理
@@ -150,11 +151,11 @@ void haixinbei(void)
           break;
       case TRACKS_LEFT_ANGLE:
           // 左直角弯
-          Motor_LeftTurn(9000);
+		  Motor_Forward(1000 , 0);
           break;
       case TRACKS_RIGHT_ANGLE:
           // 右直角弯
-          Motor_RightTurn(9000);
+          Motor_Forward(0 ,1000);
           break;
       case TRACKS_LOST:
           // 丢失轨迹，停止或执行找回操作

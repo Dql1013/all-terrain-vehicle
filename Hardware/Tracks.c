@@ -55,14 +55,14 @@ uint16_t Tracks_Read(void)
     uint16_t value = 0;
     
     // 读取8路传感器状态，PA8~PA15，PB3~PB4
-    value |= (GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_1) << 0);  // 传感器1
-    value |= (GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_2) << 1);  // 传感器2
-    value |= (GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_3) << 2);  // 传感器3
-    value |= (GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_4) << 3);  // 传感器4
-    value |= (GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_5) << 4);  // 传感器5
-    value |= (GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_6) << 5);  // 传感器6
-    value |= (GPIO_ReadInputDataBit(TRACKS_PORT_B, TRACKS_PIN_7) << 6);  // 传感器7
-    value |= (GPIO_ReadInputDataBit(TRACKS_PORT_B, TRACKS_PIN_8) << 7);  // 传感器8
+    value |= (GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_1)   << 7);  // 传感器1
+    value |= (GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_2)   << 6);  // 传感器2
+    value |= (GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_3)   << 5);  // 传感器3
+    value |= (GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_4)   << 4);  // 传感器4
+    value |= (GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_5)   << 3);  // 传感器5
+    value |= (GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_6)   << 2);  // 传感器6
+    value |= (GPIO_ReadInputDataBit(TRACKS_PORT_B, TRACKS_PIN_7) << 1);  // 传感器7
+    value |= (GPIO_ReadInputDataBit(TRACKS_PORT_B, TRACKS_PIN_8) << 0);  // 传感器8
     
     return value;
 }
@@ -98,17 +98,17 @@ uint8_t Tracks_GetStatus(uint16_t tracks_value)
     }
     
     // 检测左直角弯
-    uint16_t left_angle_pattern = 0x19;  // 0b00001111，左半部分全黑，右半部分全白
-										 // 0b00011001
-    if ((tracks_value & 0xFF) == left_angle_pattern)
+//    uint16_t left_angle_pattern = 0x01;  // 0b00001111，左半部分全黑，右半部分全白
+										   // 0b00000001
+    if (GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_1) == 1)
     {
         return TRACKS_LEFT_ANGLE;
     }
     
     // 检测右直角弯
-    uint16_t right_angle_pattern = 0x98;  // 0b11110000，右半部分全黑，左半部分全白
-										  // 0b10011000
-    if ((tracks_value & 0xFF) == right_angle_pattern)
+//    uint16_t right_angle_pattern = 0x80;  // 0b11110000，右半部分全黑，左半部分全白
+										  // 0b10000000
+    if (GPIO_ReadInputDataBit(TRACKS_PORT_B, TRACKS_PIN_8) == 1)
     {
         return TRACKS_RIGHT_ANGLE;
     }

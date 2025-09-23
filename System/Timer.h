@@ -3,10 +3,6 @@
 
 #include "stm32f10x.h"
 
-// 全局变量声明
-extern float RotateSpeed1;       //第一路编码器转速变量（单位：圈/min）
-extern float RotateSpeed2;       //第二路编码器转速变量（单位：圈/min）
-
 // 定时器相关定义
 #define PWM_FREQ_LEFT      1000  // 左电机PWM频率
 #define PWM_FREQ_RIGHT     1000  // 右电机PWM频率
@@ -21,7 +17,7 @@ void Timer1_Init(uint16_t arr, uint16_t psc);
 void Timer2_PWM_Init(uint16_t arr, uint16_t psc);
 void Timer3_Encoder_Init(void);
 void Timer4_Encoder_Init(void);
-void Set_PWM(uint16_t left_pwm, uint16_t right_pwm);
+void Set_PWM(int left_pwm, int right_pwm);
 void Set_Left_Speed(uint16_t Speed_Left);
 void Set_Right_Speed(uint16_t Speed_Right);
 int16_t Get_Encoder_Count(uint8_t encoder_num);

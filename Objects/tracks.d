@@ -31,3 +31,5 @@
 .\objects\tracks.o: .\Library\misc.h
 .\objects\tracks.o: Hardware\../System/GPIO.h
 .\objects\tracks.o: .\System\Delay.h
+.\objects\tracks.o: Hardware\TB6612.h
+.\objects\tracks.o: Hardware\../System/Timer.h

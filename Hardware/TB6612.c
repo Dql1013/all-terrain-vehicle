@@ -15,6 +15,13 @@
 *********************************************************************************************************
 */
 /*
+		Motor_Forward (left_speed , right_speed)
+		Motor_Backward(left_speed , right_speed)
+		Motor_LeftTurn (speed)
+		Motor_RightTurn(speed)
+		Motor_Stop()
+*/
+/*
 ********************************************************************************************************
 更新日志：
 
@@ -34,7 +41,7 @@ void TB6612_Init(void)
     GPIO_TB6612_Init();
     
     // 初始化时停止所有电机
-    Motor_Stop(MOTOR_ALL);
+    Motor_Stop();
     
     // 初始化PWM（通过System/Timer.c中的Timer2_PWM_Init函数）
     // 注意：PWM初始化已在Timer_All_Init中完成，这里不再重复初始化
@@ -112,7 +119,7 @@ void Motor_SetSpeed(uint8_t motor, uint16_t speed)
   * 返 回 值：无
   * 功    能：控制小车前进并设置左右电机速度
   */
-void Motor_Forward(uint16_t left_speed, uint16_t right_speed)
+void Motor_Forward(int left_speed, int right_speed)
 {
     Motor_SetDirection(MOTOR_ALL, 1);  // 设置前进方向
     Set_PWM(left_speed, right_speed);  // 设置PWM占空比
@@ -125,7 +132,7 @@ void Motor_Forward(uint16_t left_speed, uint16_t right_speed)
   * 返 回 值：无
   * 功    能：控制小车后退并设置左右电机速度
   */
-void Motor_Backward(uint16_t left_speed, uint16_t right_speed)
+void Motor_Backward(int left_speed, int right_speed)
 {
     Motor_SetDirection(MOTOR_ALL, 2);  // 设置后退方向
     Set_PWM(left_speed, right_speed);  // 设置PWM占空比
@@ -139,9 +146,9 @@ void Motor_Backward(uint16_t left_speed, uint16_t right_speed)
   */
 void Motor_LeftTurn(uint16_t speed)
 {
-    Motor_SetDirection(MOTOR_LEFT, 2);   // 左电机后退
+    Motor_SetDirection(MOTOR_LEFT, 0);   // 左电机停止
     Motor_SetDirection(MOTOR_RIGHT, 1);  // 右电机前进
-    Set_PWM(speed, speed);               // 设置PWM占空比
+    Set_PWM(0, 9000);                    // 设置PWM占空比：左轮0，右轮9000
 }
 
 /**
@@ -153,8 +160,8 @@ void Motor_LeftTurn(uint16_t speed)
 void Motor_RightTurn(uint16_t speed)
 {
     Motor_SetDirection(MOTOR_LEFT, 1);   // 左电机前进
-    Motor_SetDirection(MOTOR_RIGHT, 2);  // 右电机后退
-    Set_PWM(speed, speed);               // 设置PWM占空比
+    Motor_SetDirection(MOTOR_RIGHT, 0);  // 右电机停止
+    Set_PWM(9000, 0);                    // 设置PWM占空比：左轮9000，右轮0
 }
 
 /**
@@ -163,17 +170,10 @@ void Motor_RightTurn(uint16_t speed)
   * 返 回 值：无
   * 功    能：停止指定的电机
   */
-void Motor_Stop(uint8_t motor)
+void Motor_Stop(void)
 {
-    Motor_SetDirection(motor, 0);  // 设置停止方向
+    Motor_SetDirection(MOTOR_ALL, 0);  // 设置停止方向
     
     // 关闭PWM输出
-    if (motor == MOTOR_LEFT || motor == MOTOR_ALL)
-    {
-        Set_PWM(0, 0);
-    }
-    if (motor == MOTOR_RIGHT || motor == MOTOR_ALL)
-    {
-        Set_PWM(0, 0);
-    }
+    Set_PWM(0, 0);
 }

@@ -2,7 +2,7 @@
 .\objects\tracks.o: Hardware\Tracks.h
 .\objects\tracks.o: .\Start\stm32f10x.h
 .\objects\tracks.o: .\Start\core_cm3.h
-.\objects\tracks.o: D:\FINE\keil5.24a\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\tracks.o: D:\KEIL5\ARM\ARMCC\Bin\..\include\stdint.h
 .\objects\tracks.o: .\Start\system_stm32f10x.h
 .\objects\tracks.o: .\User\stm32f10x_conf.h
 .\objects\tracks.o: .\Library\stm32f10x_adc.h
@@ -31,3 +31,5 @@
 .\objects\tracks.o: .\Library\misc.h
 .\objects\tracks.o: Hardware\../System/GPIO.h
 .\objects\tracks.o: .\System\Delay.h
+.\objects\tracks.o: Hardware\TB6612.h
+.\objects\tracks.o: Hardware\../System/Timer.h

@@ -22,10 +22,10 @@
 void TB6612_Init(void);                    // TB6612初始化
 void Motor_SetDirection(uint8_t motor, uint8_t direction);  // 设置电机方向
 void Motor_SetSpeed(uint8_t motor, uint16_t speed);         // 设置电机速度
-void Motor_Forward(uint16_t left_speed, uint16_t right_speed);  // 前进
-void Motor_Backward(uint16_t left_speed, uint16_t right_speed); // 后退
+void Motor_Forward(int left_speed, int right_speed);  // 前进
+void Motor_Backward(int left_speed, int right_speed); // 后退
 void Motor_LeftTurn(uint16_t speed);       // 左转
 void Motor_RightTurn(uint16_t speed);      // 右转
-void Motor_Stop(uint8_t motor);            // 停止电机
+void Motor_Stop(void);            // 停止电机
 
 #endif /* __TB6612_H */

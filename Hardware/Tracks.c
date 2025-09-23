@@ -24,6 +24,10 @@
 */
 #include "Tracks.h"
 #include "Delay.h"
+#include "TB6612.h"
+
+// 声明外部变量
+extern uint16_t CrossAndBlackAreaCount;  // 从SYS.c引用的全局计数变量
 
 // 传感器阈值（根据实际调试调整）
 #define BLACK_THRESHOLD 0  // 黑色线的阈值（0表示检测到黑色）
@@ -94,14 +98,16 @@ uint8_t Tracks_GetStatus(uint16_t tracks_value)
     }
     
     // 检测左直角弯
-    uint16_t left_angle_pattern = 0x0F;  // 0b00001111，左半部分全黑，右半部分全白
+    uint16_t left_angle_pattern = 0x19;  // 0b00001111，左半部分全黑，右半部分全白
+										 // 0b00011001
     if ((tracks_value & 0xFF) == left_angle_pattern)
     {
         return TRACKS_LEFT_ANGLE;
     }
     
     // 检测右直角弯
-    uint16_t right_angle_pattern = 0xF0;  // 0b11110000，右半部分全黑，左半部分全白
+    uint16_t right_angle_pattern = 0x98;  // 0b11110000，右半部分全黑，左半部分全白
+										  // 0b10011000
     if ((tracks_value & 0xFF) == right_angle_pattern)
     {
         return TRACKS_RIGHT_ANGLE;
@@ -158,6 +164,37 @@ uint8_t Tracks_DetectCrossroad(void)
 }
 
 /**
+  * 函    数：检测并计数黑区
+  * 参    数：无
+  * 返 回 值：当前黑区计数
+  * 功    能：当传感器1和8同时检测到黑色时，增加CrossAndBlackAreaCount计数
+  */
+uint16_t Tracks_CheckAndCountBlackArea(void)
+{
+    uint16_t current_value = Tracks_Read();
+    static uint8_t prev_state = 0;  // 记录上一次的状态，防止重复计数
+    
+    // 检测传感器1和传感器8是否同时检测到黑色
+    // 传感器1: 第0位，传感器8: 第7位
+    uint8_t sensor1_black = ((current_value & (1 << 0)) == BLACK_THRESHOLD);
+    uint8_t sensor8_black = ((current_value & (1 << 7)) == BLACK_THRESHOLD);
+    
+    // 当两个传感器都检测到黑色，且上一次状态不是全黑时，计数加1
+    if (sensor1_black && sensor8_black && (prev_state == 0))
+    {
+        CrossAndBlackAreaCount++;
+        prev_state = 1;  // 更新状态为全黑
+    }
+    // 当两个传感器不同时检测到黑色时，重置状态
+    else if (!(sensor1_black && sensor8_black))
+    {
+        prev_state = 0;  // 更新状态为非全黑
+    }
+    
+    return CrossAndBlackAreaCount;
+}
+
+/**
   * 函    数：获取轨迹偏差值
   * 参    数：tracks_value - 传感器读数
   * 返 回 值：偏差值（-100到100）
@@ -170,7 +207,6 @@ int16_t Tracks_GetDeviation(uint16_t tracks_value)
     
     // 为每个传感器分配权重，越靠近中间权重越大
     int8_t weights[TRACKS_NUM] = {-4, -3, -2, -1, 1, 2, 3, 4};  // 8路传感器的权重
-    
     // 计算加权和
     for (uint8_t i = 0; i < TRACKS_NUM; i++)
     {
@@ -196,5 +232,58 @@ int16_t Tracks_GetDeviation(uint16_t tracks_value)
     if (deviation > 100) deviation = 100;
     
     return deviation;
+}
+
+/**
+  * 函    数：轨迹控制函数
+  * 参    数：left_speed - 左电机速度
+  *         right_speed - 右电机速度
+  * 返 回 值：无
+  * 功    能：根据传感器检测结果控制小车运动方向
+  */
+void Tracks_Control(uint16_t left_speed, uint16_t right_speed)
+{
+    // 读取传感器状态
+    uint16_t tracks_value = Tracks_Read();
+    
+    // 获取循迹状态
+    uint8_t status = Tracks_GetStatus(tracks_value);
+    
+    // 根据状态控制小车运动
+//    switch (status)
+//    {
+//        case TRACKS_LEFT_TURN:
+//            // 大幅偏左，需要左转调整
+//            Motor_LeftTurn(9000);
+//            break;
+//        case TRACKS_RIGHT_TURN:
+//            // 大幅偏右，需要右转调整
+//            Motor_RightTurn(9000);
+//            break;
+//        case TRACKS_STRAIGHT:
+//            // 基本直行
+//            Motor_Forward(5000, 5000);
+//            break;
+//        case TRACKS_CROSSROAD:
+//            // 检测到十字路口，继续直行
+//            Motor_Forward(5000, 5000);
+//            break;
+//        case TRACKS_LEFT_ANGLE:
+//            // 左直角弯
+//            Motor_LeftTurn(9000);
+//            break;
+//        case TRACKS_RIGHT_ANGLE:
+//            // 右直角弯
+//            Motor_RightTurn(9000);
+//            break;
+//        case TRACKS_LOST:
+//            // 丢失轨迹，停止电机
+//            Motor_Stop();
+//            break;
+//        default:
+//            // 默认情况下保持直行
+//            Motor_Forward(5000, 5000);
+//            break;
+//    }
 }
 

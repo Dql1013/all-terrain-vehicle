@@ -10,6 +10,8 @@
 #include "Timer.h"
 
 // 外设模块头文件
+//#include "../Hardware/LED.h"
+//#include "../Hardware/Key.h"
 #include "../Hardware/Encoder.h"
 #include "../Hardware/TB6612.h"
 #include "../Hardware/OLED.h"
@@ -20,5 +22,7 @@
 void STM32_System_Init(void);
 void oled_show(void);
 void haixinbei(void);
+void Update_Counter(void);  // 新增
+void Find(void);            // 新增
 
 #endif

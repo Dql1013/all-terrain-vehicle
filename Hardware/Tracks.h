@@ -22,5 +22,7 @@ uint16_t Tracks_Read(void);             // 读取所有传感器状态
 uint8_t Tracks_GetStatus(uint16_t tracks_value);  // 获取循迹状态
 uint8_t Tracks_DetectCrossroad(void);   // 检测十字路口
 int16_t Tracks_GetDeviation(uint16_t tracks_value);  // 获取偏差值用于PID控制
+uint16_t Tracks_CheckAndCountBlackArea(void);  // 检测并计数黑区函数
+void Tracks_Control(uint16_t left_speed, uint16_t right_speed);  // 轨迹控制函数
 
 #endif /* __TRACKS_H */

@@ -1,0 +1,58 @@
+#ifndef __GPIO_H
+#define __GPIO_H
+
+#include "stm32f10x.h"
+
+// 引脚定义宏 - 根据硬件连接整理
+
+#define TB6612_AIN1_PORT GPIOB
+#define TB6612_AIN1_PIN  GPIO_Pin_15
+#define TB6612_AIN2_PORT GPIOB
+#define TB6612_AIN2_PIN  GPIO_Pin_14
+#define TB6612_BIN1_PORT GPIOB
+#define TB6612_BIN1_PIN  GPIO_Pin_13
+#define TB6612_BIN2_PORT GPIOB
+#define TB6612_BIN2_PIN  GPIO_Pin_12
+
+#define ENCODER_PORT_LEFT  GPIOA
+#define ENCODER_A_LEFT     GPIO_Pin_6
+#define ENCODER_B_LEFT     GPIO_Pin_7
+#define ENCODER_PORT_RIGHT GPIOB
+#define ENCODER_A_RIGHT    GPIO_Pin_6
+#define ENCODER_B_RIGHT    GPIO_Pin_7
+
+#define TRACKS_PORT       GPIOA
+#define TRACKS_PIN_1      GPIO_Pin_8
+#define TRACKS_PIN_2      GPIO_Pin_9
+#define TRACKS_PIN_3      GPIO_Pin_10
+#define TRACKS_PIN_4      GPIO_Pin_11
+
+#define TRACKS_PORT_B     GPIOB
+#define TRACKS_PIN_5      GPIO_Pin_0
+#define TRACKS_PIN_6      GPIO_Pin_1
+#define TRACKS_PIN_7      GPIO_Pin_10
+#define TRACKS_PIN_8      GPIO_Pin_11
+
+
+// 伸缩电机引脚定义
+#define MOTOR3_PORT       GPIOA
+#define MOTOR3_PIN_PLUS   GPIO_Pin_4
+
+// 函数声明
+void GPIO_All_Init(void);
+void GPIO_LED_Init(void);
+void GPIO_Key_Init(void);
+void GPIO_TB6612_Init(void);
+void GPIO_Encoder_Init(void);
+void GPIO_Tracks_Init(void);
+
+void GPIO_Motor3_Init(void);
+
+// GPIO操作宏定义
+#define GPIO_WriteBit(Port, Pin, BitVal)   ((BitVal) ? \
+                                           GPIO_SetBits(Port, Pin) : \
+                                           GPIO_ResetBits(Port, Pin))
+#define GPIO_ReadInputBit(Port, Pin)       GPIO_ReadInputDataBit(Port, Pin)
+#define GPIO_ReadOutputBit(Port, Pin)      GPIO_ReadOutputDataBit(Port, Pin)
+
+#endif /* __GPIO_H */

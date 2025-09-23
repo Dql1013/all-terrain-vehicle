@@ -17,23 +17,6 @@
 
 #include "GPIO.h"
 
-/**
-  * 函    数：LED引脚初始化
-  * 参    数：无
-  * 返 回 值：无
-  */
-void GPIO_LED_Init(void)
-{
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-    
-    GPIO_InitTypeDef GPIO_InitStructure;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-    GPIO_InitStructure.GPIO_Pin = LED1_PIN | LED2_PIN;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(LED_PORT, &GPIO_InitStructure);
-    
-    GPIO_SetBits(LED_PORT, LED1_PIN | LED2_PIN);
-}
 
 /**
   * 函    数：按键引脚初始化
@@ -46,7 +29,7 @@ void GPIO_Key_Init(void)
     
     GPIO_InitTypeDef GPIO_InitStructure;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-    GPIO_InitStructure.GPIO_Pin = KEY1_PIN | KEY2_PIN;
+    GPIO_InitStructure.GPIO_Pin = KEY_PIN ;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(KEY_PORT, &GPIO_InitStructure);
 }
@@ -118,26 +101,6 @@ void GPIO_Tracks_Init(void)
     GPIO_Init(TRACKS_PORT_B, &GPIO_InitStructure);
 }
 
-/**
-  * 函    数：OLED引脚初始化
-  * 参    数：无
-  * 返 回 值：无
-  */
-void GPIO_OLED_Init(void)
-{
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
-    
-    GPIO_InitTypeDef GPIO_InitStructure;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Pin = OLED_SCL_PIN;  // 使用更新后的宏定义
-    GPIO_Init(OLED_PORT, &GPIO_InitStructure);
-    GPIO_InitStructure.GPIO_Pin = OLED_SDA_PIN;  // 使用更新后的宏定义
-    GPIO_Init(OLED_PORT, &GPIO_InitStructure);
-    
-    GPIO_SetBits(OLED_PORT, OLED_SCL_PIN);
-    GPIO_SetBits(OLED_PORT, OLED_SDA_PIN);
-}
 
 /**
   * 函    数：伸缩电机引脚初始化

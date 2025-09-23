@@ -15,6 +15,7 @@
 #define TRACKS_LEFT_ANGLE   5   // 左直角弯标志
 #define TRACKS_RIGHT_ANGLE  6   // 右直角弯标志
 #define TRACKS_LOST         7   // 丢失轨迹标志
+#define TRACKS_GOGOGO       8   // 其他状态
 
 // 函数声明
 void Tracks_Init(void);                 // 初始化循迹传感器

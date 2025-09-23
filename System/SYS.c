@@ -134,28 +134,27 @@ void haixinbei(void)
   {
       case TRACKS_STRAIGHT:
           // 直线行驶
-          Motor_Forward(5000, 5000);
+          Motor_Forward(500, 500);
           break;
-      case TRACKS_LEFT_TURN://怎么识别不出来
-          // 左转 - 左轮停，右轮转
-          Motor_RightTurn(9000);
-		  Motor_Forward(0, 0);
-          break;
-      case TRACKS_RIGHT_TURN:
-          // 右转 - 右轮停，左轮转
-          Motor_Forward(0, 0);
-          break;
+//      case TRACKS_LEFT_TURN:
+//          // 左转 - 左轮停，右轮转
+//		  Motor_Forward(0, 0);
+//          break;
+//      case TRACKS_RIGHT_TURN:
+//          // 右转 - 右轮停，左轮转
+//          Motor_Forward(0, 0);
+//          break;
       case TRACKS_CROSSROAD:
           // 十字路口，可以根据需要处理
-          Motor_Forward(5000, 5000);
+          Motor_Forward(500, 500);
           break;
       case TRACKS_LEFT_ANGLE:
           // 左直角弯
-		  Motor_Forward(1000 , 0);
+		  Motor_Forward(500 , 0);
           break;
       case TRACKS_RIGHT_ANGLE:
           // 右直角弯
-          Motor_Forward(0 ,1000);
+          Motor_Forward(0 ,500);
           break;
       case TRACKS_LOST:
           // 丢失轨迹，停止或执行找回操作
@@ -163,7 +162,7 @@ void haixinbei(void)
           break;
       default:
           // 默认直行
-          Motor_Forward(5000, 5000);
+          Motor_Forward(500, 500);
           break;
   }
 	

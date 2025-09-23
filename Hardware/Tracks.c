@@ -249,41 +249,6 @@ void Tracks_Control(uint16_t left_speed, uint16_t right_speed)
     // 获取循迹状态
     uint8_t status = Tracks_GetStatus(tracks_value);
     
-    // 根据状态控制小车运动
-//    switch (status)
-//    {
-//        case TRACKS_LEFT_TURN:
-//            // 大幅偏左，需要左转调整
-//            Motor_LeftTurn(9000);
-//            break;
-//        case TRACKS_RIGHT_TURN:
-//            // 大幅偏右，需要右转调整
-//            Motor_RightTurn(9000);
-//            break;
-//        case TRACKS_STRAIGHT:
-//            // 基本直行
-//            Motor_Forward(5000, 5000);
-//            break;
-//        case TRACKS_CROSSROAD:
-//            // 检测到十字路口，继续直行
-//            Motor_Forward(5000, 5000);
-//            break;
-//        case TRACKS_LEFT_ANGLE:
-//            // 左直角弯
-//            Motor_LeftTurn(9000);
-//            break;
-//        case TRACKS_RIGHT_ANGLE:
-//            // 右直角弯
-//            Motor_RightTurn(9000);
-//            break;
-//        case TRACKS_LOST:
-//            // 丢失轨迹，停止电机
-//            Motor_Stop();
-//            break;
-//        default:
-//            // 默认情况下保持直行
-//            Motor_Forward(5000, 5000);
-//            break;
-//    }
+   
 }
 

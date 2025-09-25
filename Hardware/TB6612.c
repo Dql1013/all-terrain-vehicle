@@ -121,9 +121,9 @@ void Motor_Backward(int left_speed, int right_speed)
   */
 void Motor_LeftTurn(uint16_t speed)
 {
-    Motor_SetDirection(MOTOR_LEFT, 0);   // 左电机停止
+    Motor_SetDirection(MOTOR_LEFT, 2);   // 左电机停止
     Motor_SetDirection(MOTOR_RIGHT, 1);  // 右电机前进
-    Set_PWM(0, speed);                    // 设置PWM占空比：左轮0，右轮9000
+    Set_PWM(speed, speed);                    // 设置PWM占空比：左轮0，右轮9000
 }
 
 /**
@@ -135,8 +135,8 @@ void Motor_LeftTurn(uint16_t speed)
 void Motor_RightTurn(uint16_t speed)
 {
     Motor_SetDirection(MOTOR_LEFT, 1);   // 左电机前进
-    Motor_SetDirection(MOTOR_RIGHT, 0);  // 右电机停止
-    Set_PWM(speed, 0);                    // 设置PWM占空比：左轮9000，右轮0
+    Motor_SetDirection(MOTOR_RIGHT, 2);  // 右电机停止
+    Set_PWM(speed, speed);                    // 设置PWM占空比：左轮9000，右轮0
 }
 
 /**

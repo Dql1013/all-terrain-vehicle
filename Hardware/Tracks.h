@@ -3,6 +3,9 @@
 
 #include "stm32f10x.h"
 #include "../System/GPIO.h"  // 使用GPIO宏定义
+#include "Delay.h"
+#include "TB6612.h"
+#include <stdio.h>
 
 // 循迹传感器数量
 #define TRACKS_NUM 8
@@ -19,7 +22,7 @@
 // 函数声明
 void Tracks_Init(void);                 // 初始化循迹传感器
 uint16_t Tracks_Read(void);             // 读取所有传感器状态
-uint8_t Tracks_GetStatus(uint16_t tracks_value);  // 获取循迹状态
+uint8_t Tracks_GetStatus(void);  // 获取循迹状态
 uint8_t Tracks_DetectCrossroad(void);   // 检测十字路口
 int16_t Tracks_GetDeviation(uint16_t tracks_value);  // 获取偏差值用于PID控制
 uint16_t Tracks_CheckAndCountBlackArea(void);  // 检测并计数黑区函数

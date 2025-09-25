@@ -107,64 +107,82 @@ void STM32_System_Init(void)
   */
 void haixinbei(void)
 {oled_show();
-	
-  //伸腿
-
-//	Motor3_Control(MOTOR3_EXTEND);
-	Motor_Forward(400,400);
-////	Delay_ms(1000);
-//	Car_Stop();
-//  static uint8_t haixinbei_flag = 0;
-//  if(haixinbei_flag == 0)
-//  {
-//    haixinbei_flag = 1;
-//    Motor3_TimeControl();
-//  }
-	
-  // 直接在haixinbei函数中实现循迹功能
-  // 读取传感器状态
-  uint16_t tracks_value = Tracks_Read();
-  
-  // 判断循迹状态
-  uint8_t status = Tracks_GetStatus(tracks_value);
-  
-  // 根据状态控制电机
-  switch(status)
-  {
-      case TRACKS_STRAIGHT:
-          // 直线行驶
-          Motor_Forward(5000, 5000);
-          break;
-      case TRACKS_LEFT_TURN://怎么识别不出来
-          // 左转 - 左轮停，右轮转
-//          Motor_RightTurn(9000);
-		  Motor_Forward(0, 0);
-          break;
-      case TRACKS_RIGHT_TURN:
-          // 右转 - 右轮停，左轮转
-          Motor_LeftTurn(9000);
-          break;
-      case TRACKS_CROSSROAD:
-          // 十字路口，可以根据需要处理
-          Motor_Forward(5000, 5000);
-          break;
-      case TRACKS_LEFT_ANGLE:
-          // 左直角弯
-          Motor_LeftTurn(9000);
-          break;
-      case TRACKS_RIGHT_ANGLE:
-          // 右直角弯
-          Motor_RightTurn(9000);
-          break;
-      case TRACKS_LOST:
-          // 丢失轨迹，停止或执行找回操作
-          Motor_Stop();
-          break;
-      default:
-          // 默认直行
-          Motor_Forward(5000, 5000);
-          break;
-  }
+    
+    //伸腿
+    
+    Motor_Forward(400,400);
+    
+    // 直接在haixinbei函数中实现循迹功能
+    // 读取传感器状态
+    uint16_t tracks_value = Tracks_Read();
+    
+    // 判断循迹状态
+    uint8_t status = Tracks_GetStatus();
+    
+    // 静态变量保存上一步状态，应该在函数开始处声明
+//    static uint8_t last_status = TRACKS_STRAIGHT;
+    
+    // 根据状态控制电机
+    switch(status)
+    {
+        case TRACKS_STRAIGHT:
+            // 直线行驶
+            Motor_Forward(500, 490);
+//            last_status = status; // 更新上一步状态
+            break;
+//        case TRACKS_LEFT_TURN:
+//            // 左转 - 左轮停，右轮转
+//            Motor_RightTurn(9000);
+////            last_status = status; // 更新上一步状态
+//            break;
+//        case TRACKS_RIGHT_TURN:
+//            // 右转 - 右轮停，左轮转
+//            Motor_LeftTurn(9000);
+////            last_status = status; // 更新上一步状态
+//            break;
+        case TRACKS_CROSSROAD:
+            // 十字路口，可以根据需要处理
+            Motor_Forward(500, 500);
+//            last_status = status; // 更新上一步状态
+            break;
+        case TRACKS_LEFT_ANGLE:
+            // 左直角弯
+//			Motor_Forward(0, 0);
+//			Delay_ms(500);
+            Motor_LeftTurn(9000);
+			Delay_ms(600);
+			Motor_Forward(0, 0);
+			Delay_ms(100);
+//            last_status = status; // 更新上一步状态
+            break;
+        case TRACKS_RIGHT_ANGLE:
+            // 右直角弯
+//			Motor_Forward(0, 0);
+//			Delay_ms(500);
+            Motor_RightTurn(9000);
+			Delay_ms(600);
+			Motor_Forward(0, 0);
+			Delay_ms(100);
+//            last_status = status; // 更新上一步状态
+            break;
+//        case TRACKS_LOST:
+//            // 丢失轨迹，执行上一步操作
+//            switch(last_status) {
+//                case TRACKS_STRAIGHT: Motor_Forward(500, 500); break;
+//                case TRACKS_LEFT_TURN: Motor_RightTurn(9000); break;
+//                case TRACKS_RIGHT_TURN: Motor_LeftTurn(9000); break;
+//                case TRACKS_CROSSROAD: Motor_Forward(500, 500); break;
+//                case TRACKS_LEFT_ANGLE: Motor_LeftTurn(9000); break;
+//                case TRACKS_RIGHT_ANGLE: Motor_RightTurn(9000); break;
+//                default: Motor_Forward(500, 500); break;
+//            }
+//            break;
+        default:
+            // 默认直行
+            Motor_Forward(500, 490);
+//            last_status = TRACKS_STRAIGHT; // 默认更新为直线状态
+            break;
+    }
 	
 	/*
 	Update_Counter();
@@ -262,7 +280,7 @@ void oled_show(void)
     OLED_ShowSignedNum(3, 9, encoder_right, 5);
     
     OLED_ShowString(4, 1, "Status:");
-    uint8_t status = Tracks_GetStatus(tracks_value);
+    uint8_t status = Tracks_GetStatus();
     switch(status)
     {
         case TRACKS_STRAIGHT: OLED_ShowString(4, 8, "STRAIGHT"); break;

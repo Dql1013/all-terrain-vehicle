@@ -36,4 +36,5 @@
 .\objects\main.o: .\System\../Hardware/TB6612.h
 .\objects\main.o: .\System\../Hardware/OLED.h
 .\objects\main.o: .\System\../Hardware/Tracks.h
+.\objects\main.o: D:\KEIL5\ARM\ARMCC\Bin\..\include\stdio.h
 .\objects\main.o: .\System\../Hardware/UserTasks.h

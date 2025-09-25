@@ -33,3 +33,4 @@
 .\objects\tracks.o: .\System\Delay.h
 .\objects\tracks.o: Hardware\TB6612.h
 .\objects\tracks.o: Hardware\../System/Timer.h
+.\objects\tracks.o: D:\KEIL5\ARM\ARMCC\Bin\..\include\stdio.h

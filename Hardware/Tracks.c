@@ -23,14 +23,21 @@
 *********************************************************************************************************
 */
 #include "Tracks.h"
-#include "Delay.h"
-#include "TB6612.h"
+
+
 
 // 声明外部变量
 extern uint16_t CrossAndBlackAreaCount;  // 从SYS.c引用的全局计数变量
 
 // 传感器阈值（根据实际调试调整）
 #define BLACK_THRESHOLD 0  // 黑色线的阈值（0表示检测到黑色）
+
+uint8_t byte_reverse(uint8_t data) {
+data = ((data & 0xAA) >> 1) | ((data & 0x55) << 1);
+data = ((data & 0xCC) >> 2) | ((data & 0x33) << 2);
+data = (data >> 4) | (data << 4);
+return data;
+}
 
 /**
   * 函    数：循迹传感器初始化
@@ -74,8 +81,9 @@ uint16_t Tracks_Read(void)
   * 返 回 值：循迹状态（左转、右转、直行、十字路口等）
   * 功    能：根据传感器读数判断当前的路径状态
   */
-uint8_t Tracks_GetStatus(uint16_t tracks_value)
+uint8_t Tracks_GetStatus(void)
 {
+	uint16_t tracks_value = byte_reverse(Tracks_Read());
     // 计算检测到黑色的传感器数量
     uint8_t black_count = 0;
     for (uint8_t i = 0; i < TRACKS_NUM; i++)
@@ -99,17 +107,19 @@ uint8_t Tracks_GetStatus(uint16_t tracks_value)
     }
     
     // 检测左直角弯
-    uint16_t left_angle_pattern = 0x19;  // 0b00001111，左半部分全黑，右半部分全白
-										 // 0b00011001
-    if ((tracks_value & 0xFF) == left_angle_pattern)
+//    uint16_t left_angle_pattern = 0x19;  // 0b00001111，左半部分全黑，右半部分全白
+//										 // 0b00011001
+//    if ((tracks_value & 0xFF) == left_angle_pattern)
+	if(GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_1) == BLACK_THRESHOLD)
     {
         return TRACKS_LEFT_ANGLE;
     }
     
     // 检测右直角弯
-    uint16_t right_angle_pattern = 0x98;  // 0b11110000，右半部分全黑，左半部分全白
-										  // 0b10011000
-    if ((tracks_value & 0xFF) == right_angle_pattern)
+//    uint16_t right_angle_pattern = 0x98;  // 0b11110000，右半部分全黑，左半部分全白
+//										  // 0b10011000
+//    if ((tracks_value & 0xFF) == right_angle_pattern)
+	if(GPIO_ReadInputDataBit(TRACKS_PORT_B, TRACKS_PIN_8) == BLACK_THRESHOLD)
     {
         return TRACKS_RIGHT_ANGLE;
     }
@@ -248,7 +258,7 @@ void Tracks_Control(uint16_t left_speed, uint16_t right_speed)
     uint16_t tracks_value = Tracks_Read();
     
     // 获取循迹状态
-    uint8_t status = Tracks_GetStatus(tracks_value);
+    uint8_t status = Tracks_GetStatus();
     
     // 根据状态控制小车运动
 //    switch (status)

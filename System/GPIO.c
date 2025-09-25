@@ -107,7 +107,7 @@ void GPIO_Encoder_Init(void)
     GPIO_InitTypeDef GPIO_InitStructure;
     
     // 左编码器
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
     GPIO_InitStructure.GPIO_Pin = ENCODER_A_LEFT | ENCODER_B_LEFT;
     GPIO_Init(ENCODER_PORT_LEFT, &GPIO_InitStructure);
     

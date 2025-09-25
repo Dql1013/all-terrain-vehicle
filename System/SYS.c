@@ -57,7 +57,7 @@ int right_speed = 500;
   */
 void Update_Counter(void)
 {
-    Tracks_DetectCrossroad();// 此处可以添加计数器更新的具体逻辑
+    CrossAndBlackAreaCount = Tracks_CheckAndCountBlackArea();// 此处可以添加计数器更新的具体逻辑
 }
 
 /**

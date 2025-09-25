@@ -32,6 +32,7 @@
 .\objects\main.o: .\System\Delay.h
 .\objects\main.o: .\System\GPIO.h
 .\objects\main.o: .\System\Timer.h
+.\objects\main.o: .\System\../Hardware/Key.h
 .\objects\main.o: .\System\../Hardware/Encoder.h
 .\objects\main.o: .\System\../Hardware/TB6612.h
 .\objects\main.o: .\System\../Hardware/OLED.h

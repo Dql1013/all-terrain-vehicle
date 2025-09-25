@@ -20,8 +20,7 @@
 */
 
 #include "Encoder.h"
-#include "Timer.h"
-#include "Delay.h"
+
 
 // 编码器计数值变量
 static int32_t encoder_left_count = 0;

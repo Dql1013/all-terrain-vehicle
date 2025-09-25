@@ -32,11 +32,17 @@ extern uint16_t CrossAndBlackAreaCount;  // 从SYS.c引用的全局计数变量
 // 传感器阈值（根据实际调试调整）
 #define BLACK_THRESHOLD 0  // 黑色线的阈值（0表示检测到黑色）
 
+/**
+  * 函    数：取反
+  * 参    数：data
+  * 返 回 值：atad[dog]
+  * 功    能：16进制反向用于判断
+  */
 uint8_t byte_reverse(uint8_t data) {
-data = ((data & 0xAA) >> 1) | ((data & 0x55) << 1);
-data = ((data & 0xCC) >> 2) | ((data & 0x33) << 2);
-data = (data >> 4) | (data << 4);
-return data;
+	data = ((data & 0xAA) >> 1) | ((data & 0x55) << 1);
+	data = ((data & 0xCC) >> 2) | ((data & 0x33) << 2);
+	data = (data >> 4) | (data << 4);
+	return data;
 }
 
 /**
@@ -78,11 +84,12 @@ uint16_t Tracks_Read(void)
 /**
   * 函    数：获取循迹状态
   * 参    数：tracks_value - 传感器读数
-  * 返 回 值：循迹状态（左转、右转、直行、十字路口等）
+  * 返 回 值：循迹状态（左转、右转、直行、全黑全白等）
   * 功    能：根据传感器读数判断当前的路径状态
   */
 uint8_t Tracks_GetStatus(void)
 {
+	//tracks_value--->0b[8]~[1]
 	uint16_t tracks_value = byte_reverse(Tracks_Read());
     // 计算检测到黑色的传感器数量
     uint8_t black_count = 0;
@@ -100,25 +107,13 @@ uint8_t Tracks_GetStatus(void)
         return TRACKS_LOST;
     }
     
-    // 检测十字路口
-    if (Tracks_DetectCrossroad())
-    {
-        return TRACKS_CROSSROAD;
-    }
-    
     // 检测左直角弯
-//    uint16_t left_angle_pattern = 0x19;  // 0b00001111，左半部分全黑，右半部分全白
-//										 // 0b00011001
-//    if ((tracks_value & 0xFF) == left_angle_pattern)
 	if(GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_1) == BLACK_THRESHOLD)
     {
         return TRACKS_LEFT_ANGLE;
     }
     
     // 检测右直角弯
-//    uint16_t right_angle_pattern = 0x98;  // 0b11110000，右半部分全黑，左半部分全白
-//										  // 0b10011000
-//    if ((tracks_value & 0xFF) == right_angle_pattern)
 	if(GPIO_ReadInputDataBit(TRACKS_PORT_B, TRACKS_PIN_8) == BLACK_THRESHOLD)
     {
         return TRACKS_RIGHT_ANGLE;
@@ -126,7 +121,7 @@ uint8_t Tracks_GetStatus(void)
     
 
     // 计算偏差值判断方向
-    int16_t deviation = Tracks_GetDeviation(tracks_value);
+    int16_t deviation = Tracks_GetDeviation();
     
     if (deviation < -50)  // 大幅偏左
     {
@@ -142,37 +137,6 @@ uint8_t Tracks_GetStatus(void)
     }
 }
 
-/**
-  * 函    数：检测十字路口
-  * 参    数：无
-  * 返 回 值：1=检测到十字路口，0=未检测到
-  * 功    能：通过检测横向和纵向的黑线判断是否为十字路口
-  */
-uint8_t Tracks_DetectCrossroad(void)
-{
-    // 读取当前传感器状态
-    uint16_t value = Tracks_Read();
-    
-    // 检测前后左右是否都有黑线
-    // 这里使用一个简单的判断方法：中心区域有黑线且两边也有较多黑线
-    // 将二进制字面量改为十六进制表示
-    uint8_t center_black = ((value & 0x0F0) != 0);  // 中间4个传感器是否有黑色
-    uint8_t side_black = ((value & 0x00F) != 0) && ((value & 0xF00) != 0);  // 两边是否都有黑色
-    
-    // 可以增加额外的确认步骤，例如短暂停止或减速后再次检测
-    if (center_black && side_black)
-    {
-        // 为了提高准确性，可以进行二次确认
-        Delay_ms(10);
-        uint16_t value2 = Tracks_Read();
-        uint8_t center_black2 = ((value2 & 0x0F0) != 0);
-        uint8_t side_black2 = ((value2 & 0x00F) != 0) && ((value2 & 0xF00) != 0);
-        
-        return (center_black2 && side_black2);
-    }
-    
-    return 0;
-}
 
 /**
   * 函    数：检测并计数黑区
@@ -211,8 +175,10 @@ uint16_t Tracks_CheckAndCountBlackArea(void)
   * 返 回 值：偏差值（-100到100）
   * 功    能：计算当前轨迹相对于中心的偏差，用于PID控制
   */
-int16_t Tracks_GetDeviation(uint16_t tracks_value)
+int16_t Tracks_GetDeviation(void)
 {
+	uint16_t tracks_value = Tracks_Read();
+	
     int32_t weighted_sum = 0;
     int32_t total_weight = 0;
     
@@ -248,18 +214,18 @@ int16_t Tracks_GetDeviation(uint16_t tracks_value)
 /**
   * 函    数：轨迹控制函数
   * 参    数：left_speed - 左电机速度
-  *         right_speed - 右电机速度
+  *           right_speed - 右电机速度
   * 返 回 值：无
   * 功    能：根据传感器检测结果控制小车运动方向
   */
 void Tracks_Control(int left_speed,int right_speed)
 {
-    // 读取传感器状态
-    uint16_t tracks_value = Tracks_Read();
-    
     // 获取循迹状态
     uint8_t status = Tracks_GetStatus();
-    
+	
+    left_speed  = left_speed  + Tracks_GetDeviation();
+	right_speed = right_speed - Tracks_GetDeviation();
+	
     // 根据状态控制小车运动
     switch (status)
     {

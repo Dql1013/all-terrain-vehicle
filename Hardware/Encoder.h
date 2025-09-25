@@ -3,6 +3,7 @@
 
 #include "stm32f10x.h"
 #include "Timer.h"
+#include "Delay.h"
 
 // 编码器相关宏定义
 #define ENCODER_LEFT       0       // 左编码器编号

@@ -11,7 +11,7 @@
 
 // 外设模块头文件
 //#include "../Hardware/LED.h"
-//#include "../Hardware/Key.h"
+#include "../Hardware/Key.h"
 #include "../Hardware/Encoder.h"
 #include "../Hardware/TB6612.h"
 #include "../Hardware/OLED.h"

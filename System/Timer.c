@@ -20,7 +20,7 @@
 */
 
 #include "Timer.h"
-#include "stm32f10x.h"
+
 
 /**
   * 函    数：初始化所有定时器

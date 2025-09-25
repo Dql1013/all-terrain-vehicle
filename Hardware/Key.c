@@ -1,5 +1,3 @@
-#include "stm32f10x.h"                  // Device header
-#include "Delay.h"
 #include "Key.h"
 /**
   * 函    数：按键初始化

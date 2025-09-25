@@ -1,4 +1,6 @@
 .\objects\oled.o: Hardware\OLED.c
+.\objects\oled.o: Hardware\OLED.h
+.\objects\oled.o: Hardware\../System/GPIO.h
 .\objects\oled.o: .\Start\stm32f10x.h
 .\objects\oled.o: .\Start\core_cm3.h
 .\objects\oled.o: D:\KEIL5\ARM\ARMCC\Bin\..\include\stdint.h
@@ -29,5 +31,3 @@
 .\objects\oled.o: .\Library\stm32f10x_wwdg.h
 .\objects\oled.o: .\Library\misc.h
 .\objects\oled.o: Hardware\OLED_Font.h
-.\objects\oled.o: Hardware\OLED.h
-.\objects\oled.o: Hardware\../System/GPIO.h

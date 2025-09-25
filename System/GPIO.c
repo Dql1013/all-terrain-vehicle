@@ -113,7 +113,7 @@ void GPIO_Encoder_Init(void)
     
     // 右编码器
     GPIO_InitStructure.GPIO_Pin = ENCODER_A_RIGHT | ENCODER_B_RIGHT;
-    GPIO_Init(ENCODER_PORT_RIGHT, &GPIO_InitStructure);
+    GPIO_Init(ENCODER_PORT_RIGHT, &GPIO_InitStructure); 
 }
 
 /**

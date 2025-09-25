@@ -28,6 +28,7 @@
 *********************************************************************************************************
 */
 #include "TB6612.h"
+#include "Encoder.h"  // 包含编码器相关函数
 
 /**
   * 函    数：TB6612初始化
@@ -153,4 +154,40 @@ void Motor_Stop(void)
     
     // 关闭PWM输出
     Set_PWM(0, 0);
+}
+
+/**
+  * 函    数：获取当前车速
+  * 参    数：无
+  * 返 回 值：当前车速（单位：m/s）
+  * 功    能：通过编码器数据计算当前车辆行驶速度
+  * 说    明：此函数需要根据实际硬件参数调整转换系数
+  */
+float Get_Current_Speed(void)
+{
+    // 获取左右编码器速度（单位：脉冲数/10ms）
+    float left_speed = Encoder_GetSpeed(ENCODER_LEFT);
+    float right_speed = Encoder_GetSpeed(ENCODER_RIGHT);
+    
+    // 计算平均速度
+    float avg_speed = (left_speed + right_speed) / 2.0f;
+    
+    // 转换系数：将脉冲数/10ms转换为m/s
+    // 这里需要根据实际硬件参数调整
+    // 假设：编码器每转13个脉冲，车轮直径65mm，减速比1:48
+    #define ENCODER_PULSES_PER_ROTATION 13.0f  // 编码器每转脉冲数
+    #define WHEEL_DIAMETER_METER 0.065f        // 车轮直径（米）
+    #define GEAR_RATIO 48.0f                   // 减速比
+    
+    // 计算车轮周长
+    float wheel_circumference = WHEEL_DIAMETER_METER * 3.1415926535f;
+    
+    // 计算每秒转数 = (平均速度 * 100) / (编码器每转脉冲数 * 减速比)
+    // 乘以100是因为平均速度单位是脉冲数/10ms，转换为脉冲数/秒
+    float rotations_per_second = (avg_speed * 100.0f) / (ENCODER_PULSES_PER_ROTATION * GEAR_RATIO);
+    
+    // 计算车速 = 每秒转数 * 车轮周长
+    float vehicle_speed = rotations_per_second * wheel_circumference;
+    
+    return vehicle_speed;
 }

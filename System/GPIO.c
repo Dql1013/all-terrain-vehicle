@@ -108,7 +108,7 @@ void GPIO_Tracks_Init(void)
     GPIO_InitTypeDef GPIO_InitStructure;
     
     // 寻迹传感器PA端口
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
     GPIO_InitStructure.GPIO_Pin = TRACKS_PIN_1 | TRACKS_PIN_2 | TRACKS_PIN_3 | 
                                   TRACKS_PIN_4 | TRACKS_PIN_5 | TRACKS_PIN_6;
     GPIO_Init(TRACKS_PORT, &GPIO_InitStructure);

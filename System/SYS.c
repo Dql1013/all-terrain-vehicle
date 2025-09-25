@@ -134,16 +134,16 @@ void haixinbei(void)
   {
       case TRACKS_STRAIGHT:
           // 直线行驶
-          Motor_Forward(500, 500);
+          Motor_Forward(500, 490);
           break;
-//      case TRACKS_LEFT_TURN:
-//          // 左转 - 左轮停，右轮转
-//		  Motor_Forward(0, 0);
-//          break;
-//      case TRACKS_RIGHT_TURN:
-//          // 右转 - 右轮停，左轮转
-//          Motor_Forward(0, 0);
-//          break;
+      case TRACKS_LEFT_TURN:
+          // 左转 - 左轮停，右轮转
+		  Motor_Forward(left_speed/2, right_speed*2);
+          break;
+      case TRACKS_RIGHT_TURN:
+          // 右转 - 右轮停，左轮转
+          Motor_Forward(left_speed*2, right_speed/2);
+          break;
       case TRACKS_CROSSROAD:
           // 十字路口，可以根据需要处理
           Motor_Forward(500, 500);
@@ -273,6 +273,7 @@ void oled_show(void)
         case TRACKS_RIGHT_ANGLE: OLED_ShowString(4, 8, "R-ANGLE"); break;
         case TRACKS_LOST: OLED_ShowString(4, 8, "LOST"); break;
     }
+   
 }
 
 

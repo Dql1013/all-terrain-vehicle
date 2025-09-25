@@ -19,7 +19,6 @@
 
 #include "SYS.h"
 
-
 // 全局变量定义
 uint16_t CrossAndBlackAreaCount = 0;  // 黑区计数变量
 uint8_t MAP_count = 0;                // 地图计数
@@ -89,7 +88,7 @@ void STM32_System_Init(void)
     // 初始化Hardware外设
 //    LED_Init();         // LED初始化
 //    Key_Init();         // 按键初始化
-//    Encoder_Init();     // 编码器初始化
+    Encoder_Init();     // 编码器初始化
     TB6612_Init();      // 电机驱动初始化
     OLED_Init();        // OLED显示初始化
     // 在STM32_System_Init函数中取消注释
@@ -107,12 +106,12 @@ void STM32_System_Init(void)
   * 功    能：实现海心贝路径规划算法
   */
 void haixinbei(void)
-{
-	oled_show();
+{oled_show();
+	
   //伸腿
 
 //	Motor3_Control(MOTOR3_EXTEND);
-//	Motor_Forward(400,400);
+	Motor_Forward(400,400);
 ////	Delay_ms(1000);
 //	Car_Stop();
 //  static uint8_t haixinbei_flag = 0;
@@ -134,27 +133,28 @@ void haixinbei(void)
   {
       case TRACKS_STRAIGHT:
           // 直线行驶
-          Motor_Forward(500, 490);
+          Motor_Forward(5000, 5000);
           break;
-      case TRACKS_LEFT_TURN:
+      case TRACKS_LEFT_TURN://怎么识别不出来
           // 左转 - 左轮停，右轮转
-		  Motor_Forward(left_speed/2, right_speed*2);
+//          Motor_RightTurn(9000);
+		  Motor_Forward(0, 0);
           break;
       case TRACKS_RIGHT_TURN:
           // 右转 - 右轮停，左轮转
-          Motor_Forward(left_speed*2, right_speed/2);
+          Motor_LeftTurn(9000);
           break;
       case TRACKS_CROSSROAD:
           // 十字路口，可以根据需要处理
-          Motor_Forward(500, 500);
+          Motor_Forward(5000, 5000);
           break;
       case TRACKS_LEFT_ANGLE:
           // 左直角弯
-		  Motor_Forward(500 , 0);
+          Motor_LeftTurn(9000);
           break;
       case TRACKS_RIGHT_ANGLE:
           // 右直角弯
-          Motor_Forward(0 ,500);
+          Motor_RightTurn(9000);
           break;
       case TRACKS_LOST:
           // 丢失轨迹，停止或执行找回操作
@@ -162,7 +162,7 @@ void haixinbei(void)
           break;
       default:
           // 默认直行
-          Motor_Forward(500, 500);
+          Motor_Forward(5000, 5000);
           break;
   }
 	
@@ -273,7 +273,6 @@ void oled_show(void)
         case TRACKS_RIGHT_ANGLE: OLED_ShowString(4, 8, "R-ANGLE"); break;
         case TRACKS_LOST: OLED_ShowString(4, 8, "LOST"); break;
     }
-   
 }
 
 

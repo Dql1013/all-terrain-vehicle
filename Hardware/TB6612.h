@@ -26,7 +26,5 @@ void Motor_Backward(int left_speed, int right_speed); // 后退
 void Motor_LeftTurn(uint16_t speed);       // 左转
 void Motor_RightTurn(uint16_t speed);      // 右转
 void Motor_Stop(void);            // 停止电机
-float Get_Current_Speed(void);    // 获取当前车速（单位：m/s）
-float Get_Current_Speed(void);    // 获取当前车速（单位：m/s）
 
 #endif /* __TB6612_H */

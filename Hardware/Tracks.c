@@ -10,10 +10,10 @@
         2---PA9
         3---PA10
         4---PA11
-        5---PA12
-        6---PA15
-        7---PB3
-        8---PB4
+        5---PB0
+        6---PB1
+        7---PB10
+        8---PB11
 *********************************************************************************************************
 */
 /*
@@ -55,14 +55,15 @@ uint16_t Tracks_Read(void)
     uint16_t value = 0;
     
     // 读取8路传感器状态，PA8~PA15，PB3~PB4
-    value |= (GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_1)   << 7);  // 传感器1
-    value |= (GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_2)   << 6);  // 传感器2
-    value |= (GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_3)   << 5);  // 传感器3
-    value |= (GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_4)   << 4);  // 传感器4
-    value |= (GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_5)   << 3);  // 传感器5
-    value |= (GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_6)   << 2);  // 传感器6
-    value |= (GPIO_ReadInputDataBit(TRACKS_PORT_B, TRACKS_PIN_7) << 1);  // 传感器7
-    value |= (GPIO_ReadInputDataBit(TRACKS_PORT_B, TRACKS_PIN_8) << 0);  // 传感器8
+	//value--->0b[1]~[8]
+    value |= (GPIO_ReadInputDataBit(TRACKS_PORT_B, TRACKS_PIN_8) << 0);  // 传感器1
+    value |= (GPIO_ReadInputDataBit(TRACKS_PORT_B, TRACKS_PIN_7) << 1);  // 传感器2
+    value |= (GPIO_ReadInputDataBit(TRACKS_PORT_B, TRACKS_PIN_6) << 2);  // 传感器3
+    value |= (GPIO_ReadInputDataBit(TRACKS_PORT_B, TRACKS_PIN_5) << 3);  // 传感器4
+    value |= (GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_4) << 4);  // 传感器5
+    value |= (GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_3) << 5);  // 传感器6
+    value |= (GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_2) << 6);  // 传感器7
+    value |= (GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_1) << 7);  // 传感器8
     
     return value;
 }
@@ -98,17 +99,17 @@ uint8_t Tracks_GetStatus(uint16_t tracks_value)
     }
     
     // 检测左直角弯
-//    uint16_t left_angle_pattern = 0x01;  // 0b00001111，左半部分全黑，右半部分全白
-										   // 0b00000001
-    if (GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_1) == 1)
+    uint16_t left_angle_pattern = 0x19;  // 0b00001111，左半部分全黑，右半部分全白
+										 // 0b00011001
+    if ((tracks_value & 0xFF) == left_angle_pattern)
     {
         return TRACKS_LEFT_ANGLE;
     }
     
     // 检测右直角弯
-//    uint16_t right_angle_pattern = 0x80;  // 0b11110000，右半部分全黑，左半部分全白
-										  // 0b10000000
-    if (GPIO_ReadInputDataBit(TRACKS_PORT_B, TRACKS_PIN_8) == 1)
+    uint16_t right_angle_pattern = 0x98;  // 0b11110000，右半部分全黑，左半部分全白
+										  // 0b10011000
+    if ((tracks_value & 0xFF) == right_angle_pattern)
     {
         return TRACKS_RIGHT_ANGLE;
     }
@@ -249,6 +250,41 @@ void Tracks_Control(uint16_t left_speed, uint16_t right_speed)
     // 获取循迹状态
     uint8_t status = Tracks_GetStatus(tracks_value);
     
-   
+    // 根据状态控制小车运动
+//    switch (status)
+//    {
+//        case TRACKS_LEFT_TURN:
+//            // 大幅偏左，需要左转调整
+//            Motor_LeftTurn(9000);
+//            break;
+//        case TRACKS_RIGHT_TURN:
+//            // 大幅偏右，需要右转调整
+//            Motor_RightTurn(9000);
+//            break;
+//        case TRACKS_STRAIGHT:
+//            // 基本直行
+//            Motor_Forward(5000, 5000);
+//            break;
+//        case TRACKS_CROSSROAD:
+//            // 检测到十字路口，继续直行
+//            Motor_Forward(5000, 5000);
+//            break;
+//        case TRACKS_LEFT_ANGLE:
+//            // 左直角弯
+//            Motor_LeftTurn(9000);
+//            break;
+//        case TRACKS_RIGHT_ANGLE:
+//            // 右直角弯
+//            Motor_RightTurn(9000);
+//            break;
+//        case TRACKS_LOST:
+//            // 丢失轨迹，停止电机
+//            Motor_Stop();
+//            break;
+//        default:
+//            // 默认情况下保持直行
+//            Motor_Forward(5000, 5000);
+//            break;
+//    }
 }
 

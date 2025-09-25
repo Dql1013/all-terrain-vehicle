@@ -252,7 +252,7 @@ int16_t Tracks_GetDeviation(uint16_t tracks_value)
   * 返 回 值：无
   * 功    能：根据传感器检测结果控制小车运动方向
   */
-void Tracks_Control(uint16_t left_speed, uint16_t right_speed)
+void Tracks_Control(int left_speed,int right_speed)
 {
     // 读取传感器状态
     uint16_t tracks_value = Tracks_Read();
@@ -261,40 +261,40 @@ void Tracks_Control(uint16_t left_speed, uint16_t right_speed)
     uint8_t status = Tracks_GetStatus();
     
     // 根据状态控制小车运动
-//    switch (status)
-//    {
-//        case TRACKS_LEFT_TURN:
-//            // 大幅偏左，需要左转调整
-//            Motor_LeftTurn(9000);
-//            break;
-//        case TRACKS_RIGHT_TURN:
-//            // 大幅偏右，需要右转调整
-//            Motor_RightTurn(9000);
-//            break;
-//        case TRACKS_STRAIGHT:
-//            // 基本直行
-//            Motor_Forward(5000, 5000);
-//            break;
-//        case TRACKS_CROSSROAD:
-//            // 检测到十字路口，继续直行
-//            Motor_Forward(5000, 5000);
-//            break;
-//        case TRACKS_LEFT_ANGLE:
-//            // 左直角弯
-//            Motor_LeftTurn(9000);
-//            break;
-//        case TRACKS_RIGHT_ANGLE:
-//            // 右直角弯
-//            Motor_RightTurn(9000);
-//            break;
-//        case TRACKS_LOST:
-//            // 丢失轨迹，停止电机
-//            Motor_Stop();
-//            break;
-//        default:
-//            // 默认情况下保持直行
-//            Motor_Forward(5000, 5000);
-//            break;
-//    }
+    switch (status)
+    {
+        case TRACKS_LEFT_TURN:
+            // 大幅偏左，需要左转调整
+            Motor_LeftTurn(250);
+            break;
+        case TRACKS_RIGHT_TURN:
+            // 大幅偏右，需要右转调整
+            Motor_RightTurn(250);
+            break;
+        case TRACKS_STRAIGHT:
+            // 基本直行
+            Motor_Forward(left_speed, right_speed);
+            break;
+        case TRACKS_CROSSROAD:
+            // 检测到十字路口，继续直行
+            Motor_Forward(left_speed, right_speed);
+            break;
+        case TRACKS_LEFT_ANGLE:
+            // 左直角弯
+            Motor_LeftTurn_90();
+            break;
+        case TRACKS_RIGHT_ANGLE:
+            // 右直角弯
+            Motor_RightTurn_90();
+            break;
+        case TRACKS_LOST:
+            // 丢失轨迹，停止电机
+            Motor_Stop();
+            break;
+        default:
+            // 默认情况下保持直行
+            Motor_Forward(left_speed, right_speed);
+            break;
+    }
 }
 

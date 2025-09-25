@@ -29,6 +29,7 @@
 */
 #include "TB6612.h"
 
+
 /**
   * 函    数：TB6612初始化
   * 参    数：无
@@ -152,3 +153,28 @@ void Motor_Stop(void)
     // 关闭PWM输出
     Set_PWM(0, 0);
 }
+
+/**
+  * 函    数：小车左转90度
+  * 参    数：无
+  * 返 回 值：无
+  * 功    能：控制小车向左转90度
+  */
+void Motor_LeftTurn_90(void)
+{
+    Motor_LeftTurn(1000);
+	Delay_ms(600);
+}
+
+/**
+  * 函    数：小车右转90度
+  * 参    数：无
+  * 返 回 值：无
+  * 功    能：控制小车向右转90度
+  */
+void Motor_RightTurn_90(void)
+{
+    Motor_RightTurn(1000);
+	Delay_ms(600);
+}
+

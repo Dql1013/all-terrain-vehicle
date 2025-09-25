@@ -170,7 +170,7 @@ void GPIO_Motor3_Init(void)
   */
 void GPIO_All_Init(void)
 {
-		GPIO_OLED_Init();
+	GPIO_OLED_Init();
     GPIO_Key_Init();
     GPIO_TB6612_Init();
     GPIO_Encoder_Init();

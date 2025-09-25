@@ -86,17 +86,13 @@ void STM32_System_Init(void)
     Timer_All_Init();
     
     // 初始化Hardware外设
-//    LED_Init();         // LED初始化
-//    Key_Init();         // 按键初始化
     Encoder_Init();     // 编码器初始化
     TB6612_Init();      // 电机驱动初始化
     OLED_Init();        // OLED显示初始化
     // 在STM32_System_Init函数中取消注释
     Tracks_Init();      // 循迹传感器初始化
-//    UserTasks_Init();   // 用户任务初始化
+    UserTasks_Init();   // 用户任务初始化
     
-    // 系统初始化完成，点亮LED1作为指示
-//    LED1_ON();
 }
 
 /**
@@ -108,7 +104,8 @@ void STM32_System_Init(void)
 void haixinbei(void)
 {
 	oled_show();
-
+	while(Key_GetNum()== 0){}
+	Tracks_Control(left_speed,right_speed);
 	/*
 	Update_Counter();
 	if		 (CrossAndBlackAreaCount == 0  ) { MAP_count = 0 ; FIND_Flag = 0;Update_Counter();

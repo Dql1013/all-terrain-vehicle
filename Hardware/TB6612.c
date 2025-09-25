@@ -42,9 +42,7 @@ void TB6612_Init(void)
     
     // 初始化时停止所有电机
     Motor_Stop();
-    
-    // 初始化PWM（通过System/Timer.c中的Timer2_PWM_Init函数）
-    // 注意：PWM初始化已在Timer_All_Init中完成，这里不再重复初始化
+
 }
 
 /**

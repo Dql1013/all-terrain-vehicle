@@ -4,6 +4,22 @@
 #include "stm32f10x.h"
 
 // 引脚定义宏 - 根据硬件连接整理
+
+#define OLED_PORT GPIOA
+#define OLED_D0  GPIO_Pin_1
+#define OLED_D1  GPIO_Pin_0
+
+#define OLED_PORT_C GPIOC
+#define OLED_RES  GPIO_Pin_15
+#define OLED_DC   GPIO_Pin_14
+#define OLED_CS   GPIO_Pin_13
+
+#define OLED_W_D0(x)		GPIO_WriteBit(OLED_PORT  , OLED_D0 , (BitAction)(x))
+#define OLED_W_D1(x)		GPIO_WriteBit(OLED_PORT  , OLED_D1 , (BitAction)(x))
+#define OLED_W_RES(x)		GPIO_WriteBit(OLED_PORT_C, OLED_RES, (BitAction)(x))
+#define OLED_W_DC(x)		GPIO_WriteBit(OLED_PORT_C, OLED_DC , (BitAction)(x))
+#define OLED_W_CS(x)		GPIO_WriteBit(OLED_PORT_C, OLED_CS , (BitAction)(x))
+
 #define KEY_PORT         GPIOB
 #define KEY_PIN          GPIO_Pin_4
 
@@ -45,12 +61,12 @@
 
 // 函数声明
 void GPIO_All_Init(void);
+void GPIO_OLED_Init(void);
 void GPIO_LED_Init(void);
 void GPIO_Key_Init(void);
 void GPIO_TB6612_Init(void);
 void GPIO_Encoder_Init(void);
 void GPIO_Tracks_Init(void);
-void GPIO_OLED_Init(void);
 void GPIO_Motor3_Init(void);
 
 // GPIO操作宏定义

@@ -21,41 +21,7 @@
 */
 #include "stm32f10x.h"
 #include "OLED_Font.h"
-
-/*引脚配置*/
-#define OLED_W_D0(x)		GPIO_WriteBit(GPIOA, GPIO_Pin_1, (BitAction)(x))
-#define OLED_W_D1(x)		GPIO_WriteBit(GPIOA, GPIO_Pin_0, (BitAction)(x))
-#define OLED_W_RES(x)		GPIO_WriteBit(GPIOC, GPIO_Pin_15, (BitAction)(x))
-#define OLED_W_DC(x)		GPIO_WriteBit(GPIOC, GPIO_Pin_14, (BitAction)(x))
-#define OLED_W_CS(x)		GPIO_WriteBit(GPIOC, GPIO_Pin_13, (BitAction)(x))
-
-/*引脚初始化*/
-void OLED_SPI_Init(void)
-{
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
-	
-	GPIO_InitTypeDef GPIO_InitStructure;
- 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; 
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
- 	GPIO_Init(GPIOA, &GPIO_InitStructure);
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
- 	GPIO_Init(GPIOA, &GPIO_InitStructure);
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;
- 	GPIO_Init(GPIOC, &GPIO_InitStructure);
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14;
- 	GPIO_Init(GPIOC, &GPIO_InitStructure);
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13;
- 	GPIO_Init(GPIOC, &GPIO_InitStructure);
-	
-	
-	OLED_W_D0(0);
-	OLED_W_D1(1);
-	OLED_W_RES(1);
-	OLED_W_DC(1);
-	OLED_W_CS(1);
-}
+#include "OLED.h"
 
 /**
   * @brief  SPI发送一个字节
@@ -283,7 +249,7 @@ void OLED_Init(void)
 		for (j = 0; j < 1000; j++);
 	}
 	
-	OLED_SPI_Init();			//端口初始化
+	GPIO_OLED_Init();			//端口初始化
 	
 	OLED_WriteCommand(0xAE);	//关闭显示
 	

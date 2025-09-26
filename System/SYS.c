@@ -19,57 +19,61 @@
 
 #include "SYS.h"
 
-// 全局变量定义
+uint16_t encoder_left,encoder_right;
+int speed_left,speed_right;
 uint16_t CrossAndBlackAreaCount = 0;  // 黑区计数变量
-uint8_t MAP_count = 0;                // 地图计数
-uint8_t FIND_Flag = 0;                // 查找标志
+//// 全局变量定义
+//
+//uint8_t MAP_count = 0;                // 地图计数
+//uint8_t FIND_Flag = 0;                // 查找标志
 
-// 路径控制相关变量
-uint8_t case_0 = 0;
-uint8_t case_1 = 0;
-uint8_t case_2 = 0;
-uint8_t case_3 = 0;
-uint8_t case_4 = 0;
-uint8_t case_5 = 0;
-uint8_t case_6 = 0;
-uint8_t case_7 = 0;
-uint8_t case_8 = 0;
-uint8_t case_9 = 0;
-uint8_t case_10 = 0;
-uint8_t case_11 = 0;
-uint8_t case_12 = 0;
-uint8_t case_13 = 0;
-uint8_t case_14 = 0;
-uint8_t case_15 = 0;
-uint8_t case_16 = 0;
-uint8_t case_17 = 0;
-uint8_t case_18 = 0;
+
+//	
+//// 路径控制相关变量
+//uint8_t case_0 = 0;
+//uint8_t case_1 = 0;
+//uint8_t case_2 = 0;
+//uint8_t case_3 = 0;
+//uint8_t case_4 = 0;
+//uint8_t case_5 = 0;
+//uint8_t case_6 = 0;
+//uint8_t case_7 = 0;
+//uint8_t case_8 = 0;
+//uint8_t case_9 = 0;
+//uint8_t case_10 = 0;
+//uint8_t case_11 = 0;
+//uint8_t case_12 = 0;
+//uint8_t case_13 = 0;
+//uint8_t case_14 = 0;
+//uint8_t case_15 = 0;
+//uint8_t case_16 = 0;
+//uint8_t case_17 = 0;
+//uint8_t case_18 = 0;
 
 // 电机速度参数
-int left_speed = 500;
-int right_speed = 500;
+int16_t left_speed = 100 , right_speed = 100;
 
-/**
-  * 函    数：更新计数器函数
-  * 参    数：无
-  * 返 回 值：无
-  * 功    能：更新计数状态
-  */
-void Update_Counter(void)
-{
-    CrossAndBlackAreaCount = Tracks_CheckAndCountBlackArea();// 此处可以添加计数器更新的具体逻辑
-}
+///**
+//  * 函    数：更新计数器函数
+//  * 参    数：无
+//  * 返 回 值：无
+//  * 功    能：更新计数状态
+//  */
+//void Update_Counter(void)
+//{
+//    CrossAndBlackAreaCount = Tracks_CheckAndCountBlackArea();// 此处可以添加计数器更新的具体逻辑
+//}
 
-/**
-  * 函    数：查找路径函数
-  * 参    数：无
-  * 返 回 值：无
-  * 功    能：控制小车寻找路径
-  */
-void Find(void)
-{
-    Tracks_Control(left_speed, right_speed);
-}
+///**
+//  * 函    数：查找路径函数
+//  * 参    数：无
+//  * 返 回 值：无
+//  * 功    能：控制小车寻找路径
+//  */
+//void Find(void)
+//{
+//    Tracks_Control(left_speed, right_speed);
+//}
 
 /**
   * 函    数：系统全局初始化
@@ -80,7 +84,9 @@ void Find(void)
 void STM32_System_Init(void)
 {
     // 初始化GPIO引脚
-    GPIO_All_Init();
+    GPIO_All_Init();	
+												// 循迹传感器初始化
+												// 用户任务初始化
     
     // 初始化定时器
     Timer_All_Init();
@@ -89,10 +95,6 @@ void STM32_System_Init(void)
     Encoder_Init();     // 编码器初始化
     TB6612_Init();      // 电机驱动初始化
     OLED_Init();        // OLED显示初始化
-    // 在STM32_System_Init函数中取消注释
-    Tracks_Init();      // 循迹传感器初始化
-    UserTasks_Init();   // 用户任务初始化
-    
 }
 
 /**
@@ -104,8 +106,12 @@ void STM32_System_Init(void)
 void haixinbei(void)
 {
 	oled_show();
-	while(Key_GetNum()== 0){}
-	Tracks_Control(left_speed,right_speed);
+	Motor_SetDirection(MOTOR_ALL,1);
+//	Motor_Forward(left_speed,right_speed);
+//	Motor_RightTurn_90();
+//	Motor_Backward(left_speed,right_speed);
+////	while(Key_GetNum()== 0){}
+//	Tracks_Control(left_speed,right_speed);
 	/*
 	Update_Counter();
 	if		 (CrossAndBlackAreaCount == 0  ) { MAP_count = 0 ; FIND_Flag = 0;Update_Counter();
@@ -184,7 +190,7 @@ void haixinbei(void)
   * 返 回 值：无
   * 功    能：在OLED上显示系统状态信息
   */
-void oled_show(void)
+/*void oled_show(void)
 {
     // 显示系统状态信息
     uint16_t tracks_value = Tracks_Read();
@@ -213,9 +219,47 @@ void oled_show(void)
         case TRACKS_RIGHT_ANGLE: OLED_ShowString(4, 8, "R-ANGLE"); break;
         case TRACKS_LOST: OLED_ShowString(4, 8, "LOST"); break;
     }
+}*/
+void oled_show(void)
+{
+//	int16_t Speed;
+//	OLED_ShowString(1, 1, "Speed:00000r/min");
+//	OLED_ShowString(2, 1, "Duty:000000%");
+//	OLED_ShowString(3, 1, "SetSpeed:00000");
+//	OLED_ShowSignedNum(1, 7, Speed, 4);          //显示实际速度
+//	OLED_ShowNum(2,6,TIM_GetCapture3(TIM2),6);   //显示占空比
+		OLED_ShowSignedNum(1, 1, encoder_left, 8);
+		OLED_ShowSignedNum(2, 1, encoder_right, 8);
+		OLED_ShowNum(3,1,TIM_GetCapture3(TIM2),6);   //显示占空比
+		OLED_ShowNum(4,1,TIM_GetCapture3(TIM2),6);   //显示占空比
+//	OLED_ShowSignedNum(3, 10, setspeed, 4);       //显示设定速度
 }
 
+void TIM1_UP_IRQHandler(void) 
+{ 	    	  	     
+	if (TIM_GetITStatus(TIM1, TIM_IT_Update) != RESET)//检查指定的TIM中断发生与否:TIM 中断源 
+	{
+		TIM_ClearITPendingBit(TIM1, TIM_IT_Update);//清除TIMx的中断待处理位:TIM 中断源 
+				// 在这里添加定时中断处理代码
+		encoder_left = Encoder_GetCount_Left();
+		encoder_right = Encoder_GetCount_Right();
+		//判断encoder_left大于F000,encoder_left=FFFF-encoder_left
+		if(encoder_left > 0xF000)
+		{
+			 encoder_left = -0xFFFF + encoder_left;
+		}
+		//判断encoder_right大于F000,encoder_right=FFFF-encoder_right
+		if(encoder_right > 0xF000)
+		{
+			encoder_right = -0xFFFF + encoder_right;
+		}
+			uint16_t TIM2_CCR_L=0,TIM2_CCR_R=0;   //PWM比较值
+			TIM2_CCR_L=PID(encoder_left*75,left_speed);   //把新的比较值赋值给CCR
+			TIM2_CCR_R=PID(encoder_right*75,right_speed);
+			Set_PWM(TIM2_CCR_L,TIM2_CCR_R);                   //把新的CCR值设定到定时器2的第三通道
 
+	}
+}
 
 
 

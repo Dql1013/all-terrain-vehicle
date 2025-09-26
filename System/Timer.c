@@ -20,8 +20,9 @@
 */
 
 #include "Timer.h"
+// 声明外部变量
 
-
+	
 /**
   * 函    数：初始化所有定时器
   * 参    数：无
@@ -29,15 +30,15 @@
   */
 void Timer_All_Init(void)
 {
-    // 初始化中断定时器(默认1ms中断)
-    Timer1_Init(999, 71);
-    
+  
     // 初始化PWM定时器(1kHz频率，更适合电机控制)
     Timer2_PWM_Init(999, 71);
     
     // 初始化编码器定时器，用于闭环控制提高扭矩稳定性
     Timer3_Encoder_Init();
     Timer4_Encoder_Init();
+	
+		NVIC_Timer_Init();
 }
 
 /**
@@ -46,28 +47,37 @@ void Timer_All_Init(void)
   *           psc 预分频器值
   * 返 回 值：无
   */
-void Timer1_Init(uint16_t arr, uint16_t psc)
-{
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
-    
-    TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-    TIM_TimeBaseStructure.TIM_Period = arr;
-    TIM_TimeBaseStructure.TIM_Prescaler = psc;
-    TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
-    TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_TimeBaseStructure.TIM_RepetitionCounter = 0;
-    TIM_TimeBaseInit(TIM1, &TIM_TimeBaseStructure);
-    
-    TIM_ITConfig(TIM1, TIM_IT_Update, ENABLE);
-    
-    NVIC_InitTypeDef NVIC_InitStructure;
-    NVIC_InitStructure.NVIC_IRQChannel = TIM1_UP_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
-    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&NVIC_InitStructure);
-    
-    TIM_Cmd(TIM1, ENABLE);
+void NVIC_Timer_Init(void)
+{    
+  TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
+  NVIC_InitTypeDef NVIC_InitStructure;
+
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE); //时钟使能
+
+  TIM_TimeBaseStructure.TIM_Period = 5000 - 1; //设置自动重装载寄存器周期值
+  TIM_TimeBaseStructure.TIM_Prescaler = 720 - 1;//设置预分频值
+  TIM_TimeBaseStructure.TIM_ClockDivision = 0; //设置时钟分割
+  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;//向上计数模式
+  TIM_TimeBaseStructure.TIM_RepetitionCounter = 0;//重复计数设置
+  TIM_TimeBaseInit(TIM1, &TIM_TimeBaseStructure); //参数初始化
+  TIM_ClearFlag(TIM1, TIM_FLAG_Update);//清中断标志位
+
+  TIM_ITConfig(      //使能或者失能指定的TIM中断
+    TIM1,            //TIM1
+    TIM_IT_Update  | //TIM 更新中断源
+    TIM_IT_Trigger,  //TIM 触发中断源 
+    ENABLE  	     //使能
+    );
+	
+  //设置优先级
+  NVIC_InitStructure.NVIC_IRQChannel = TIM1_UP_IRQn;  
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;//先占优先级0级
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;  	   //从优先级0级
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure); 
+
+  TIM_Cmd(TIM1, ENABLE);  //使能TIMx外设
+
 }
 
 /**
@@ -109,35 +119,28 @@ void Timer2_PWM_Init(uint16_t arr, uint16_t psc)
   */
 void Timer3_Encoder_Init(void)
 {
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
-    
-    // 配置编码器模式
-    TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-    TIM_TimeBaseStructure.TIM_Period = 65535;
-    TIM_TimeBaseStructure.TIM_Prescaler = 0;
-    TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
-    TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure);
-    
-    // 配置编码器接口
-    TIM_ICInitTypeDef TIM_ICInitStructure;
-    TIM_ICStructInit(&TIM_ICInitStructure);
-    TIM_ICInitStructure.TIM_Channel = TIM_Channel_1;
-    TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
-    TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
-    TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
-    TIM_ICInitStructure.TIM_ICFilter = 0;
-    TIM_ICInit(TIM3, &TIM_ICInitStructure);
-    
-    TIM_ICInitStructure.TIM_Channel = TIM_Channel_2;
-    TIM_ICInit(TIM3, &TIM_ICInitStructure);
-    
-    // 设置编码器模式
-    TIM_EncoderInterfaceConfig(TIM3, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising, TIM_ICPolarity_Rising);
-    
-    // 清除计数器并启动定时器
-    TIM_SetCounter(TIM3, 0);
-    TIM_Cmd(TIM3, ENABLE);
+	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;  
+  TIM_ICInitTypeDef TIM_ICInitStructure;  
+//  GPIO_InitTypeDef GPIO_InitStructure;
+	
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);   //使能定时器
+	
+  TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);  
+  TIM_TimeBaseStructure.TIM_Prescaler = 0x0; 							// No prescaling     //不分频
+  TIM_TimeBaseStructure.TIM_Period = ENCODER_TIM_PERIOD;  //设定计数器自动重装值
+  TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1; //选择时钟分频：不分频
+  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up; //TIM向上计数    
+  TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure);  //初始化定时器
+  
+  TIM_EncoderInterfaceConfig(TIM3, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising, TIM_ICPolarity_Rising);//使用编码器模式3
+  TIM_ICStructInit(&TIM_ICInitStructure);
+  TIM_ICInitStructure.TIM_ICFilter = 0;
+  TIM_ICInit(TIM3, &TIM_ICInitStructure);  
+	
+  TIM_ClearFlag(TIM3, TIM_FLAG_Update);//清除TIM的更新标志位
+  TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
+	TIM_SetCounter(TIM3,0);
+  TIM_Cmd(TIM3, ENABLE); 
 }
 
 /**
@@ -147,35 +150,28 @@ void Timer3_Encoder_Init(void)
   */
 void Timer4_Encoder_Init(void)
 {
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
+	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;  
+  TIM_ICInitTypeDef TIM_ICInitStructure;  
+//  GPIO_InitTypeDef GPIO_InitStructure;
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);//使能定时器4的时钟
     
-    // 配置编码器模式
-    TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-    TIM_TimeBaseStructure.TIM_Period = 65535;
-    TIM_TimeBaseStructure.TIM_Prescaler = 0;
-    TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
-    TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-    TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
-    
-    // 配置编码器接口
-    TIM_ICInitTypeDef TIM_ICInitStructure;
-    TIM_ICStructInit(&TIM_ICInitStructure);
-    TIM_ICInitStructure.TIM_Channel = TIM_Channel_1;
-    TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
-    TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
-    TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
-    TIM_ICInitStructure.TIM_ICFilter = 0;
-    TIM_ICInit(TIM4, &TIM_ICInitStructure);
-    
-    TIM_ICInitStructure.TIM_Channel = TIM_Channel_2;
-    TIM_ICInit(TIM4, &TIM_ICInitStructure);
-    
-    // 设置编码器模式
-    TIM_EncoderInterfaceConfig(TIM4, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising, TIM_ICPolarity_Rising);
-    
-    // 清除计数器并启动定时器
-    TIM_SetCounter(TIM4, 0);
-    TIM_Cmd(TIM4, ENABLE);
+  TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
+  
+  TIM_TimeBaseStructure.TIM_Prescaler = 0x0; // No prescaling 
+  TIM_TimeBaseStructure.TIM_Period = ENCODER_TIM_PERIOD; //设定计数器自动重装值
+  TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;//选择时钟分频：不分频
+  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;   //TIM向上计数  
+  TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
+  
+  TIM_EncoderInterfaceConfig(TIM4, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising, TIM_ICPolarity_Falling);//使用编码器模式3
+  TIM_ICStructInit(&TIM_ICInitStructure);
+  TIM_ICInitStructure.TIM_ICFilter = 0;
+  TIM_ICInit(TIM4, &TIM_ICInitStructure);
+  
+  TIM_ClearFlag(TIM4, TIM_FLAG_Update);
+  TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE);
+	TIM_SetCounter(TIM4,0);
+  TIM_Cmd(TIM4, ENABLE); 
 }
 
 /**
@@ -184,69 +180,31 @@ void Timer4_Encoder_Init(void)
   *           right_pwm 右电机PWM占空比(0-999)
   * 返 回 值：无
   */
-void Set_PWM(int left_speed , int right_speed)
+void Set_PWM(uint16_t left_speed , uint16_t right_speed)
 {
-	if (left_speed  > 1000) left_speed  = 1000;
-	if (right_speed > 1000) right_speed = 1000;
+//	if (left_speed  < 400) left_speed  = 400;
+//	if (right_speed < 400) right_speed = 400;
+//	if (left_speed  > 1000) left_speed  = 1000;
+//	if (right_speed > 1000) right_speed = 1000;
 	TIM_SetCompare3(TIM2, left_speed);			
 	TIM_SetCompare4(TIM2, right_speed);
 }
 
-
 /**
-  * 函    数：获取编码器计数值
-  * 参    数：encoder_num 编码器编号(0:左,1:右)
-  * 返 回 值：编码器计数值
-  */
-int16_t Get_Encoder_Count(uint8_t encoder_num)
-{
-    int16_t count = 0;
-    
-    if (encoder_num == 0)  // 左编码器
-    {
-        count = (int16_t)TIM_GetCounter(TIM3);
-        TIM_SetCounter(TIM3, 0);  // 读取后清零
-    }
-    else if (encoder_num == 1)  // 右编码器
-    {
-        count = (int16_t)TIM_GetCounter(TIM4);
-        TIM_SetCounter(TIM4, 0);  // 读取后清零
-    }
-    
-    return count;
-}
-
-/**
-  * 函    数：清除编码器计数
-  * 参    数：encoder_num 编码器编号(0:左,1:右)
-  * 返 回 值：无
-  */
-void Clear_Encoder_Count(uint8_t encoder_num)
-{
-    if (encoder_num == 0)
-    {
-        TIM_SetCounter(TIM3, 0);
-    }
-    else if (encoder_num == 1)
-    {
-        TIM_SetCounter(TIM4, 0);
-    }
-}
-
-/**
-  * 函    数：TIM1中断服务函数
+  * 函    数：TIM2中断函数
   * 参    数：无
   * 返 回 值：无
+  * 注意事项：此函数为中断函数，无需调用，中断触发后自动执行
+  *           函数名为预留的指定名称，可以从启动文件复制
+  *           请确保函数名正确，不能有任何差异，否则中断函数将不能进入
   */
-// 注意：此函数需要在stm32f10x_it.c中实现
-
-void TIM1_UP_IRQHandler(void)
-{
-    if (TIM_GetITStatus(TIM1, TIM_IT_Update) != RESET)
-    {
-        // 在这里添加定时中断处理代码
-        
-        TIM_ClearITPendingBit(TIM1, TIM_IT_Update);
-    }
-}
-
+/* 定时器中断函数，可以复制到使用它的地方
+void TIM1_UP_IRQHandler(void) 
+{ 	    	  	     
+	if (TIM_GetITStatus(TIM1, TIM_IT_Update) != RESET)//检查指定的TIM中断发生与否:TIM 中断源 
+	{
+		TIM_ClearITPendingBit(TIM1, TIM_IT_Update);//清除TIMx的中断待处理位:TIM 中断源 
+//在此处添加中断执行内容
+	}	     
+} 
+*/

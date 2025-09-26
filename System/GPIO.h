@@ -5,32 +5,38 @@
 
 // 引脚定义宏 - 根据硬件连接整理
 
+//#define OLED_PORT GPIOA
+//#define OLED_D0  GPIO_Pin_1
+//#define OLED_D1  GPIO_Pin_0
+
+//#define OLED_PORT_C GPIOC
+//#define OLED_RES  GPIO_Pin_15
+//#define OLED_DC   GPIO_Pin_14
+//#define OLED_CS   GPIO_Pin_13
+
 #define OLED_PORT GPIOA
-#define OLED_D0  GPIO_Pin_1
-#define OLED_D1  GPIO_Pin_0
+#define OLED_CS GPIO_Pin_1
+#define OLED_DC GPIO_Pin_0
 
 #define OLED_PORT_C GPIOC
 #define OLED_RES  GPIO_Pin_15
-#define OLED_DC   GPIO_Pin_14
-#define OLED_CS   GPIO_Pin_13
+#define OLED_D1		GPIO_Pin_14
+#define OLED_D0		GPIO_Pin_13
 
-#define OLED_W_D0(x)		GPIO_WriteBit(OLED_PORT  , OLED_D0 , (BitAction)(x))
-#define OLED_W_D1(x)		GPIO_WriteBit(OLED_PORT  , OLED_D1 , (BitAction)(x))
+#define OLED_W_D0(x)		GPIO_WriteBit(OLED_PORT_C, OLED_D0 , (BitAction)(x))
+#define OLED_W_D1(x)		GPIO_WriteBit(OLED_PORT_C, OLED_D1 , (BitAction)(x))
 #define OLED_W_RES(x)		GPIO_WriteBit(OLED_PORT_C, OLED_RES, (BitAction)(x))
-#define OLED_W_DC(x)		GPIO_WriteBit(OLED_PORT_C, OLED_DC , (BitAction)(x))
-#define OLED_W_CS(x)		GPIO_WriteBit(OLED_PORT_C, OLED_CS , (BitAction)(x))
+#define OLED_W_DC(x)		GPIO_WriteBit(OLED_PORT  , OLED_DC , (BitAction)(x))
+#define OLED_W_CS(x)		GPIO_WriteBit(OLED_PORT  , OLED_CS , (BitAction)(x))
 
 #define KEY_PORT         GPIOB
 #define KEY_PIN          GPIO_Pin_4
 
-#define TB6612_AIN1_PORT GPIOB
+#define TB6612_IN_PORT GPIOB
 #define TB6612_AIN1_PIN  GPIO_Pin_15
-#define TB6612_AIN2_PORT GPIOB
 #define TB6612_AIN2_PIN  GPIO_Pin_14
-#define TB6612_BIN1_PORT GPIOB
-#define TB6612_BIN1_PIN  GPIO_Pin_13
-#define TB6612_BIN2_PORT GPIOB
-#define TB6612_BIN2_PIN  GPIO_Pin_12
+#define TB6612_BIN1_PIN  GPIO_Pin_12
+#define TB6612_BIN2_PIN  GPIO_Pin_13
 
 #define TB6612_PWM GPIOA
 #define TB6612_PWMA  GPIO_Pin_2
@@ -40,8 +46,8 @@
 #define ENCODER_A_LEFT     GPIO_Pin_6
 #define ENCODER_B_LEFT     GPIO_Pin_7
 #define ENCODER_PORT_RIGHT GPIOB
-#define ENCODER_A_RIGHT    GPIO_Pin_6
-#define ENCODER_B_RIGHT    GPIO_Pin_7
+#define ENCODER_A_RIGHT    GPIO_Pin_7
+#define ENCODER_B_RIGHT    GPIO_Pin_6
 
 #define TRACKS_PORT       GPIOA
 #define TRACKS_PIN_1      GPIO_Pin_8

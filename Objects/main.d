@@ -2,7 +2,7 @@
 .\objects\main.o: .\System\SYS.h
 .\objects\main.o: .\Start\stm32f10x.h
 .\objects\main.o: .\Start\core_cm3.h
-.\objects\main.o: D:\KEIL5\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\main.o: D:\FINE\keil5.24a\ARM\ARMCC\Bin\..\include\stdint.h
 .\objects\main.o: .\Start\system_stm32f10x.h
 .\objects\main.o: .\User\stm32f10x_conf.h
 .\objects\main.o: .\Library\stm32f10x_adc.h
@@ -32,10 +32,12 @@
 .\objects\main.o: .\System\Delay.h
 .\objects\main.o: .\System\GPIO.h
 .\objects\main.o: .\System\Timer.h
-.\objects\main.o: .\System\../Hardware/Key.h
-.\objects\main.o: .\System\../Hardware/Encoder.h
-.\objects\main.o: .\System\../Hardware/TB6612.h
+.\objects\main.o: .\Hardware\Encoder.h
+.\objects\main.o: .\System\Timer.h
 .\objects\main.o: .\System\../Hardware/OLED.h
+.\objects\main.o: .\System\../Hardware/Key.h
+.\objects\main.o: .\System\../Hardware/TB6612.h
 .\objects\main.o: .\System\../Hardware/Tracks.h
-.\objects\main.o: D:\KEIL5\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\main.o: D:\FINE\keil5.24a\ARM\ARMCC\Bin\..\include\stdio.h
 .\objects\main.o: .\System\../Hardware/UserTasks.h
+.\objects\main.o: .\System\../Hardware/PID.h

@@ -17,6 +17,7 @@
 #include "../Hardware/OLED.h"
 #include "../Hardware/Tracks.h"
 #include "../Hardware/UserTasks.h"
+#include "../Hardware/PID.h"
 
 // 用户任务函数声明
 void STM32_System_Init(void);

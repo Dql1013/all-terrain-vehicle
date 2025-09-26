@@ -163,7 +163,9 @@ void Motor_Stop(void)
 void Motor_LeftTurn_90(void)
 {
     Motor_LeftTurn(1000);
-	Delay_ms(600);
+		Delay_ms(600);
+		Motor_Stop();
+		Delay_ms(100);
 }
 
 /**
@@ -174,7 +176,9 @@ void Motor_LeftTurn_90(void)
   */
 void Motor_RightTurn_90(void)
 {
-    Motor_RightTurn(1000);
-	Delay_ms(600);
+		Motor_RightTurn(1000);
+		Delay_ms(600);
+		Motor_Stop();
+		Delay_ms(100);
 }
 

@@ -3,7 +3,7 @@
 .\objects\key.o: Hardware\../System/GPIO.h
 .\objects\key.o: .\Start\stm32f10x.h
 .\objects\key.o: .\Start\core_cm3.h
-.\objects\key.o: D:\KEIL5\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\key.o: D:\FINE\keil5.24a\ARM\ARMCC\Bin\..\include\stdint.h
 .\objects\key.o: .\Start\system_stm32f10x.h
 .\objects\key.o: .\User\stm32f10x_conf.h
 .\objects\key.o: .\Library\stm32f10x_adc.h

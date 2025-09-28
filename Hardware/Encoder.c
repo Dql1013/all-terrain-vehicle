@@ -44,19 +44,18 @@ void Encoder_Init(void)
   */
 int16_t Encoder_GetCount_Left(void)
 {
-	
-		int16_t Temp;
-		Temp= (short)ENCODER_TIM_LEFT -> CNT;   ENCODER_TIM_LEFT -> CNT=0; 
-//		Temp = TIM_GetCounter(ENCODER_TIM_LEFT);
-//		TIM_SetCounter(ENCODER_TIM_LEFT, 0);
-		return Temp;
+	/*使用Temp变量作为中继，目的是返回CNT后将其清零*/
+	int16_t Temp;
+	Temp = TIM_GetCounter(TIM3);
+	TIM_SetCounter(TIM3, 0);
+	return Temp;
 }
 int16_t Encoder_GetCount_Right(void)
 {
-		int16_t Temp;
-		Temp= (short)ENCODER_TIM_RIGHT -> CNT;   ENCODER_TIM_RIGHT -> CNT=0;
-//		Temp = TIM_GetCounter(ENCODER_TIM_RIGHT);
-//		TIM_SetCounter(ENCODER_TIM_RIGHT, 0);
-		return Temp;
+	/*使用Temp变量作为中继，目的是返回CNT后将其清零*/
+	int16_t Temp;
+	Temp = TIM_GetCounter(TIM4);
+	TIM_SetCounter(TIM4, 0);
+	return Temp;
 }
 

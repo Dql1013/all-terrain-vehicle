@@ -90,22 +90,24 @@ void GPIO_TB6612_Init(void)
   */
 void GPIO_Encoder_Init(void)
 {
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);			//开启GPIOA的时钟
     
-    GPIO_InitTypeDef GPIO_InitStructure;
-    
-    // 左编码器
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+			/*GPIO初始化*/
+		GPIO_InitTypeDef GPIO_InitStructure;
+		GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+		GPIO_InitStructure.GPIO_Pin = ENCODER_A_LEFT | ENCODER_B_LEFT;
 		GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Pin = ENCODER_A_LEFT | ENCODER_B_LEFT;
-    GPIO_Init(ENCODER_PORT_LEFT, &GPIO_InitStructure);
-    
-    // 右编码器
-	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+		GPIO_Init(GPIOA, &GPIO_InitStructure);						//将PA6和PA7引脚初始化为上拉输入
+
+		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);			//开启GPIOB的时钟
+	/*GPIO初始化*/
+//	GPIO_InitTypeDef GPIO_InitStructure;
+		GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+		GPIO_InitStructure.GPIO_Pin = ENCODER_A_RIGHT | ENCODER_B_RIGHT;
 		GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Pin = ENCODER_A_RIGHT | ENCODER_B_RIGHT;
-    GPIO_Init(ENCODER_PORT_RIGHT, &GPIO_InitStructure); 
-}
+		GPIO_Init(GPIOB, &GPIO_InitStructure);						//将PB6和PB7引脚初始化为上拉输入
+	
+	}
 
 /**
   * 函    数：红外寻迹模块引脚初始化

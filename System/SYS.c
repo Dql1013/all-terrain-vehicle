@@ -19,9 +19,13 @@
 
 #include "SYS.h"
 
-uint16_t encoder_left,encoder_right;
-int speed_left,speed_right;
-uint16_t CrossAndBlackAreaCount = 0;  // 黑区计数变量
+int16_t encoder_left,encoder_right;
+int16_t speed_left,speed_right;
+
+float RotateSpeed1;       //定义第一路编码器转速变量（单位：圈/S）
+float RotateSpeed2;       //定义第二路编码器转速变量（单位：圈/S）
+
+int16_t CrossAndBlackAreaCount = 0;  // 黑区计数变量
 //// 全局变量定义
 //
 //uint8_t MAP_count = 0;                // 地图计数
@@ -51,8 +55,8 @@ uint16_t CrossAndBlackAreaCount = 0;  // 黑区计数变量
 //uint8_t case_18 = 0;
 
 // 电机速度参数
-int16_t left_speed = 100 , right_speed = 100;
-
+int16_t left_speed = 500 , right_speed = 500;
+int16_t TIM2_CCR_L=0,TIM2_CCR_R=0;   //PWM比较值
 ///**
 //  * 函    数：更新计数器函数
 //  * 参    数：无
@@ -107,9 +111,11 @@ void haixinbei(void)
 {
 	oled_show();
 	Motor_SetDirection(MOTOR_ALL,1);
-//	Motor_Forward(left_speed,right_speed);
+	
+//	Set_PWM(TIM2_CCR_L ,TIM2_CCR_R);
+//	Motor_Forward(400,400);
 //	Motor_RightTurn_90();
-//	Motor_Backward(left_speed,right_speed);
+//	Motor_Backward(300,300);
 ////	while(Key_GetNum()== 0){}
 //	Tracks_Control(left_speed,right_speed);
 	/*
@@ -228,10 +234,14 @@ void oled_show(void)
 //	OLED_ShowString(3, 1, "SetSpeed:00000");
 //	OLED_ShowSignedNum(1, 7, Speed, 4);          //显示实际速度
 //	OLED_ShowNum(2,6,TIM_GetCapture3(TIM2),6);   //显示占空比
-		OLED_ShowSignedNum(1, 1, encoder_left, 8);
-		OLED_ShowSignedNum(2, 1, encoder_right, 8);
+//		OLED_ShowSignedNum(1, 1, encoder_left, 8);
+//		OLED_ShowSignedNum(2, 1, encoder_right, 8);
 		OLED_ShowNum(3,1,TIM_GetCapture3(TIM2),6);   //显示占空比
-		OLED_ShowNum(4,1,TIM_GetCapture3(TIM2),6);   //显示占空比
+		OLED_ShowNum(3,8,TIM_GetCapture4(TIM2),6);   //显示占空比
+		OLED_ShowSignedNum(1, 1, (int32_t)RotateSpeed1, 2);	//显示第一路编码器转速
+		OLED_ShowSignedNum(1, 8, (int32_t)RotateSpeed2, 2);	//显示第二路编码器转速
+		OLED_ShowSignedNum(2, 1, TIM2_CCR_L, 5);	//显示第一路编码器转速
+		OLED_ShowSignedNum(2, 8, TIM2_CCR_R, 5);	//显示第二路编码器转速	
 //	OLED_ShowSignedNum(3, 10, setspeed, 4);       //显示设定速度
 }
 
@@ -239,24 +249,18 @@ void TIM1_UP_IRQHandler(void)
 { 	    	  	     
 	if (TIM_GetITStatus(TIM1, TIM_IT_Update) != RESET)//检查指定的TIM中断发生与否:TIM 中断源 
 	{
+		encoder_left = Encoder_GetCount_Left();							//每隔固定时间段读取一次第一路编码器计数增量值
+		encoder_right = Encoder_GetCount_Right();						//每隔固定时间段读取一次第二路编码器计数增量值
+		// 计算转速（圈/S） = (脉冲数/采样周期) / (编码器每转脉冲数*4) * 1
+		// 乘以4是因为使用了TIM_EncoderMode_TI12模式
+		RotateSpeed1 = (encoder_left  / SAMPLE_PERIOD) / (ENCODER_PPR );
+		RotateSpeed2 = (encoder_right / SAMPLE_PERIOD) / (ENCODER_PPR );
+
+		TIM2_CCR_L = PID_L(RotateSpeed1,5);
+		TIM2_CCR_R = PID_R(RotateSpeed2,5);
+		
+		Set_PWM(TIM2_CCR_L,TIM2_CCR_R);                   //把新的CCR值设定到定时器2的第三通道
 		TIM_ClearITPendingBit(TIM1, TIM_IT_Update);//清除TIMx的中断待处理位:TIM 中断源 
-				// 在这里添加定时中断处理代码
-		encoder_left = Encoder_GetCount_Left();
-		encoder_right = Encoder_GetCount_Right();
-		//判断encoder_left大于F000,encoder_left=FFFF-encoder_left
-		if(encoder_left > 0xF000)
-		{
-			 encoder_left = -0xFFFF + encoder_left;
-		}
-		//判断encoder_right大于F000,encoder_right=FFFF-encoder_right
-		if(encoder_right > 0xF000)
-		{
-			encoder_right = -0xFFFF + encoder_right;
-		}
-			uint16_t TIM2_CCR_L=0,TIM2_CCR_R=0;   //PWM比较值
-			TIM2_CCR_L=PID(encoder_left*75,left_speed);   //把新的比较值赋值给CCR
-			TIM2_CCR_R=PID(encoder_right*75,right_speed);
-			Set_PWM(TIM2_CCR_L,TIM2_CCR_R);                   //把新的CCR值设定到定时器2的第三通道
 
 	}
 }

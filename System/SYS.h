@@ -19,6 +19,12 @@
 #include "../Hardware/UserTasks.h"
 #include "../Hardware/PID.h"
 
+
+#define ENCODER_PPR 11*45  //编码器每转脉冲数（根据实际编码器修改此值）
+#define SAMPLE_PERIOD 0.1 //采样周期（秒）	9999/719
+
+
+
 // 用户任务函数声明
 void STM32_System_Init(void);
 void oled_show(void);

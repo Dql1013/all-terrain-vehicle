@@ -28,7 +28,7 @@
 
 // 声明外部变量
 extern uint16_t CrossAndBlackAreaCount;  // 从SYS.c引用的全局计数变量
-
+extern uint16_t weighted_sum;
 // 传感器阈值（根据实际调试调整）
 #define BLACK_THRESHOLD 0  // 黑色线的阈值（0表示检测到黑色）
 
@@ -46,18 +46,6 @@ uint8_t byte_reverse(uint8_t data) {
 }
 
 /**
-  * 函    数：循迹传感器初始化
-  * 参    数：无
-  * 返 回 值：无
-  * 功    能：初始化所有循迹传感器的GPIO引脚
-  */
-void Tracks_Init(void)
-{
-    // 调用System/GPIO.c中的GPIO_Tracks_Init函数初始化引脚
-    GPIO_Tracks_Init();
-}
-
-/**
   * 函    数：读取所有循迹传感器状态
   * 参    数：无
   * 返 回 值：16位整数，每一位代表一个传感器的状态（0=检测到黑色，1=检测到白色）
@@ -68,7 +56,7 @@ uint16_t Tracks_Read(void)
     uint16_t value = 0;
     
     // 读取8路传感器状态，PA8~PA15，PB3~PB4
-	//value--->0b[1]~[8]
+		//value--->0b[1]~[8]
     value |= (GPIO_ReadInputDataBit(TRACKS_PORT_B, TRACKS_PIN_8) << 0);  // 传感器1
     value |= (GPIO_ReadInputDataBit(TRACKS_PORT_B, TRACKS_PIN_7) << 1);  // 传感器2
     value |= (GPIO_ReadInputDataBit(TRACKS_PORT_B, TRACKS_PIN_6) << 2);  // 传感器3
@@ -89,10 +77,12 @@ uint16_t Tracks_Read(void)
   */
 uint8_t Tracks_GetStatus(void)
 {
-	//tracks_value--->0b[8]~[1]
-	uint16_t tracks_value = byte_reverse(Tracks_Read());
+		//tracks_value--->0b[1]~[8]
+		uint16_t tracks_value = Tracks_Read();
     // 计算检测到黑色的传感器数量
     uint8_t black_count = 0;
+		int16_t deviation = Tracks_GetDeviation();
+		
     for (uint8_t i = 0; i < TRACKS_NUM; i++)
     {
         if ((tracks_value & (1 << i)) == BLACK_THRESHOLD)
@@ -100,41 +90,42 @@ uint8_t Tracks_GetStatus(void)
             black_count++;
         }
     }
-    
-    // 如果所有传感器都检测到白色，说明丢失了轨迹
+		// 如果所有传感器都检测到白色，说明丢失了轨迹
     if (black_count == 0)
     {
         return TRACKS_LOST;
     }
-    
+		// 如果所有传感器都检测到黑色，说明全黑
+    else if (black_count == 8)
+    {
+        return TRACKS_LOST;
+    }
+		
     // 检测左直角弯
-	if(GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_1) == BLACK_THRESHOLD)
+		else if(GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_1) == BLACK_THRESHOLD)
     {
         return TRACKS_LEFT_ANGLE;
     }
     
     // 检测右直角弯
-	if(GPIO_ReadInputDataBit(TRACKS_PORT_B, TRACKS_PIN_8) == BLACK_THRESHOLD)
-    {
-        return TRACKS_RIGHT_ANGLE;
-    }
-    
-
-    // 计算偏差值判断方向
-    int16_t deviation = Tracks_GetDeviation();
-    
-    if (deviation < -50)  // 大幅偏左
-    {
-        return TRACKS_LEFT_TURN;
-    }
-    else if (deviation > 50)  // 大幅偏右
-    {
-        return TRACKS_RIGHT_TURN;
-    }
-    else  // 基本直行
-    {
-        return TRACKS_STRAIGHT;
-    }
+		else if(GPIO_ReadInputDataBit(TRACKS_PORT_B, TRACKS_PIN_8) == BLACK_THRESHOLD)
+			{
+					return TRACKS_RIGHT_ANGLE;
+			}
+		// 偏左	
+    else if (deviation < -1)  
+			{
+					return TRACKS_RIGHT_TURN;
+			}
+		// 偏右	
+		else if (deviation > 1)  
+			{
+					return TRACKS_LEFT_TURN;
+			}
+		//走就完了	
+		else return TRACKS_STRAIGHT;
+				
+//    return ELSE;
 }
 
 
@@ -146,6 +137,7 @@ uint8_t Tracks_GetStatus(void)
   */
 uint16_t Tracks_CheckAndCountBlackArea(void)
 {
+		//tracks_value--->0b[1]~[8]
     uint16_t current_value = Tracks_Read();
     static uint8_t prev_state = 0;  // 记录上一次的状态，防止重复计数
     
@@ -177,9 +169,10 @@ uint16_t Tracks_CheckAndCountBlackArea(void)
   */
 int16_t Tracks_GetDeviation(void)
 {
+	//tracks_value--->0b[1]~[8]
 	uint16_t tracks_value = Tracks_Read();
 	
-    int32_t weighted_sum = 0;
+    weighted_sum = 0;
     int32_t total_weight = 0;
     
     // 为每个传感器分配权重，越靠近中间权重越大
@@ -196,20 +189,13 @@ int16_t Tracks_GetDeviation(void)
     }
     
     // 防止除零错误
-    if (total_weight == 0)
+    if (total_weight == TRACKS_NUM)
     {
-        return 0;
+        return weighted_sum;
     }
-    
-    // 计算偏差值（-100到100）
-    int16_t deviation = (weighted_sum * 100) / (total_weight * 4);
-    
-    // 限制偏差值范围
-    if (deviation < -100) deviation = -100;
-    if (deviation > 100) deviation = 100;
-    
-    return deviation;
+		return 0;
 }
+
 
 /**
   * 函    数：轨迹控制函数

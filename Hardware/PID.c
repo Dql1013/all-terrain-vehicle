@@ -42,10 +42,10 @@ int16_t PID_L(int16_t speed,int16_t setspeed)
 //	                                                    
 //	}
 	    pwm_CCR_L+=Add_CCR_L;
-	  if(pwm_CCR_L>9999)
-        pwm_CCR_L=9999;
-    if(pwm_CCR_L<300)
-        pwm_CCR_L=300;
+	  if(pwm_CCR_L > 9999)
+        pwm_CCR_L = 9999;
+    if(pwm_CCR_L < 300)
+        pwm_CCR_L = 300;
     LastLastErr_L=LastErr_L;                       											//把上一次误差赋值给上上次误差
     LastErr_L=Err_L;																										//把最新误差赋值给上次误差
     return pwm_CCR_L;																					//返回PWM新的占空比值
@@ -60,10 +60,10 @@ int16_t PID_R(int16_t speed,int16_t setspeed)
 //	                                                  
 //	}
 	    pwm_CCR_R+=Add_CCR_R;  
-	  if(pwm_CCR_R>9999)
-        pwm_CCR_R=9999;
-		if(pwm_CCR_R<300)
-        pwm_CCR_R=300;
+	  if(pwm_CCR_R > 9999)
+        pwm_CCR_R = 9999;
+		if(pwm_CCR_R < 300)
+        pwm_CCR_R = 300;
 //    if(pwm_CCR<0)
 //        pwm_CCR=0;
     LastLastErr_R=LastErr_R;                       											//把上一次误差赋值给上上次误差

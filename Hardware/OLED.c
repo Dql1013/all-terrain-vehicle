@@ -94,7 +94,23 @@ void OLED_Clear(void)
 		}
 	}
 }
-
+/**
+  * @brief  OLED清行
+  * @param  无
+  * @retval 无
+  */
+void OLED_PartClear(uint8_t x0)
+{
+	uint8_t i, j;
+    for( i=x0;i < x0+2;i++)
+    {
+			OLED_SetCursor(i, 0);
+				for(j = 0; j < 128; j++)
+				{
+					OLED_WriteData(0x00);
+				}
+    }
+}
 /**
   * @brief  OLED显示一个字符
   * @param  Line 行位置，范围：1~4

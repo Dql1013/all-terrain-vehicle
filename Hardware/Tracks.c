@@ -28,7 +28,7 @@
 
 // 声明外部变量
 extern uint16_t CrossAndBlackAreaCount;  // 从SYS.c引用的全局计数变量
-extern uint16_t weighted_sum;
+extern int weighted_sum;
 // 传感器阈值（根据实际调试调整）
 #define BLACK_THRESHOLD 0  // 黑色线的阈值（0表示检测到黑色）
 
@@ -80,28 +80,19 @@ uint8_t Tracks_GetStatus(void)
 		//tracks_value--->0b[1]~[8]
 		uint16_t tracks_value = Tracks_Read();
     // 计算检测到黑色的传感器数量
-    uint8_t black_count = 0;
-		int16_t deviation = Tracks_GetDeviation();
-		
-    for (uint8_t i = 0; i < TRACKS_NUM; i++)
-    {
-        if ((tracks_value & (1 << i)) == BLACK_THRESHOLD)
-        {
-            black_count++;
-        }
-    }
-		// 如果所有传感器都检测到白色，说明丢失了轨迹
-    if (black_count == 0)
-    {
-        return TRACKS_LOST;
-    }
-		// 如果所有传感器都检测到黑色，说明全黑
-    else if (black_count == 8)
-    {
-        return TRACKS_LOST;
-    }
-		
-    // 检测左直角弯
+//    uint8_t black_count = 0;
+//		int32_t total_black_count = 0;
+		weighted_sum = Tracks_GetDeviation();
+    
+		if(tracks_value == 0xFF)
+		{
+				return TRACKS_CROSSROAD;
+		}
+		else if(tracks_value == 0x00)
+		{
+				return TRACKS_LOST;
+		}
+		// 检测左直角弯
 		else if(GPIO_ReadInputDataBit(TRACKS_PORT, TRACKS_PIN_1) == BLACK_THRESHOLD)
     {
         return TRACKS_LEFT_ANGLE;
@@ -109,23 +100,27 @@ uint8_t Tracks_GetStatus(void)
     
     // 检测右直角弯
 		else if(GPIO_ReadInputDataBit(TRACKS_PORT_B, TRACKS_PIN_8) == BLACK_THRESHOLD)
+		{
+				return TRACKS_RIGHT_ANGLE;
+		}
+
+		else if (weighted_sum == 0 )  
 			{
-					return TRACKS_RIGHT_ANGLE;
+					return TRACKS_STRAIGHT;
 			}
-		// 偏左	
-    else if (deviation < -1)  
+		else if (weighted_sum < 0 )  
 			{
 					return TRACKS_RIGHT_TURN;
 			}
 		// 偏右	
-		else if (deviation > 1)  
+		else if (weighted_sum > 0 )  
 			{
 					return TRACKS_LEFT_TURN;
 			}
 		//走就完了	
 		else return TRACKS_STRAIGHT;
-				
-//    return ELSE;
+
+			
 }
 
 
@@ -167,13 +162,13 @@ uint16_t Tracks_CheckAndCountBlackArea(void)
   * 返 回 值：偏差值（-100到100）
   * 功    能：计算当前轨迹相对于中心的偏差，用于PID控制
   */
-int16_t Tracks_GetDeviation(void)
+int Tracks_GetDeviation(void)
 {
 	//tracks_value--->0b[1]~[8]
 	uint16_t tracks_value = Tracks_Read();
 	
     weighted_sum = 0;
-    int32_t total_weight = 0;
+    int total_weight = 0;
     
     // 为每个传感器分配权重，越靠近中间权重越大
     int8_t weights[TRACKS_NUM] = {-4, -3, -2, -1, 1, 2, 3, 4};  // 8路传感器的权重
@@ -187,13 +182,9 @@ int16_t Tracks_GetDeviation(void)
             total_weight += 1;
         }
     }
+		int deviation = (weighted_sum * 100) / (total_weight * 4);
     
-    // 防止除零错误
-    if (total_weight == TRACKS_NUM)
-    {
-        return weighted_sum;
-    }
-		return 0;
+return deviation;
 }
 
 
@@ -210,18 +201,18 @@ void Tracks_Control(int left_speed,int right_speed)
     uint8_t status = Tracks_GetStatus();
 	
     left_speed  = left_speed  + Tracks_GetDeviation();
-	right_speed = right_speed - Tracks_GetDeviation();
+		right_speed = right_speed - Tracks_GetDeviation();
 	
     // 根据状态控制小车运动
     switch (status)
     {
         case TRACKS_LEFT_TURN:
             // 大幅偏左，需要左转调整
-            Motor_LeftTurn(250);
+            Motor_Forward(left_speed, right_speed);
             break;
         case TRACKS_RIGHT_TURN:
             // 大幅偏右，需要右转调整
-            Motor_RightTurn(250);
+            Motor_Forward(left_speed, right_speed);
             break;
         case TRACKS_STRAIGHT:
             // 基本直行

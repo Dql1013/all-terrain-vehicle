@@ -23,10 +23,10 @@ int16_t encoder_left,encoder_right;
 float RotateSpeed1,RotateSpeed2;       //定义编码器转速变量（单位：圈/S）
 
 int16_t CrossAndBlackAreaCount = 0;  // 黑区计数变量
-int16_t weighted_sum = 0;  // 黑区计数变量
+int weighted_sum = 0;  						// 传感器状态
 // 电机速度参数
 int16_t left_speed = 500 , right_speed = 500;
-int16_t closed_loop_left_speed = 5 , closed_loop_right_speed = 5;
+int16_t closed_loop_left_speed = 4 , closed_loop_right_speed = 4;
 int16_t TIM2_CCR_L=0,TIM2_CCR_R=0;   //PWM比较值
 
 uint8_t status ,status_L;
@@ -61,14 +61,10 @@ void STM32_System_Init(void)
 void haixinbei(void)
 {
 	oled_show();
-	Motor_SetDirection(MOTOR_ALL,1);
+	
 	Tracks_CheckAndCountBlackArea();
-//	Set_PWM(TIM2_CCR_L ,TIM2_CCR_R);
-//	Motor_Forward(400,400);
-//	Motor_RightTurn_90();
-//	Motor_Backward(300,300);
-////	while(Key_GetNum()== 0){}
-//	Tracks_Control(left_speed,right_speed);
+	
+	
 	/*
 	Update_Counter();
 	if		 (CrossAndBlackAreaCount == 0  ) { MAP_count = 0 ; FIND_Flag = 0;Update_Counter();
@@ -151,7 +147,7 @@ void oled_show(void)
 {
     // 显示系统状态信息
     uint16_t tracks_value = Tracks_Read();
-    
+    status = Tracks_GetStatus();
 //    OLED_Clear();
     OLED_ShowString(1, 1, "Tracks:");
     OLED_ShowBinNum(1, 8, tracks_value, 8);
@@ -162,40 +158,28 @@ void oled_show(void)
     OLED_ShowString(2, 9, "R_En:");
     OLED_ShowSignedNum(2, 14, RotateSpeed2, 2);
     OLED_ShowSignedNum(3, 1, CrossAndBlackAreaCount, 2);
-    OLED_ShowSignedNum(3, 4, weighted_sum, 2);
-		OLED_ShowSignedNum(3, 8, status, 2);
+	
+//    OLED_ShowSignedNum(3, 6, weighted_sum, 3);
+//	
+//		OLED_ShowSignedNum(3, 12, status, 2);
+		
+		OLED_ShowNum(3,5,TIM_GetCapture3(TIM2),4);   //显示占空比
+		OLED_ShowNum(3,11,TIM_GetCapture4(TIM2),4);   //显示占空比
 		if(status != status_L) OLED_PartClear(6);
     switch(status)
     {
         case TRACKS_STRAIGHT:			OLED_ShowString(4, 1, "STRAIGHT"); 		break;
         case TRACKS_LEFT_TURN:		OLED_ShowString(4, 1, "LEFT"); 				break;
         case TRACKS_RIGHT_TURN:		OLED_ShowString(4, 1, "RIGHT"); 			break;
-        case TRACKS_CROSSROAD:		OLED_ShowString(4, 1, "CLOSED"); 			break;
-			  case TRACKS_LOST:					OLED_ShowString(4, 1, "CLOSED LOOP"); break;
+        case TRACKS_CROSSROAD:		OLED_ShowString(4, 1, "CROSSROAD"); 	break;
+			  case TRACKS_LOST:					OLED_ShowString(4, 1, "LOST"); 				break;
         case TRACKS_LEFT_ANGLE:		OLED_ShowString(4, 1, "L-ANGLE"); 		break;
         case TRACKS_RIGHT_ANGLE:	OLED_ShowString(4, 1, "R-ANGLE"); 		break;
+				case TRACKS_ELSE:					OLED_ShowString(4, 1, "ELSE"); 				break;
     }
 		status_L = status;
 		
 }
-//void oled_show(void)
-//{
-////	int16_t Speed;
-////	OLED_ShowString(1, 1, "Speed:00000r/min");
-////	OLED_ShowString(2, 1, "Duty:000000%");
-////	OLED_ShowString(3, 1, "SetSpeed:00000");
-////	OLED_ShowSignedNum(1, 7, Speed, 4);          //显示实际速度
-////	OLED_ShowNum(2,6,TIM_GetCapture3(TIM2),6);   //显示占空比
-////		OLED_ShowSignedNum(1, 1, encoder_left, 8);
-////		OLED_ShowSignedNum(2, 1, encoder_right, 8);
-//		OLED_ShowNum(3,1,TIM_GetCapture3(TIM2),6);   //显示占空比
-//		OLED_ShowNum(3,8,TIM_GetCapture4(TIM2),6);   //显示占空比
-//		OLED_ShowSignedNum(1, 1, (int32_t)RotateSpeed1, 2);	//显示第一路编码器转速
-//		OLED_ShowSignedNum(1, 8, (int32_t)RotateSpeed2, 2);	//显示第二路编码器转速
-//		OLED_ShowSignedNum(2, 1, TIM2_CCR_L, 5);	//显示第一路编码器转速
-//		OLED_ShowSignedNum(2, 8, TIM2_CCR_R, 5);	//显示第二路编码器转速	
-////	OLED_ShowSignedNum(3, 10, setspeed, 4);       //显示设定速度
-//}
 
 void TIM1_UP_IRQHandler(void) 
 { 	    	  	     
@@ -210,9 +194,12 @@ void TIM1_UP_IRQHandler(void)
 
 		TIM2_CCR_L = PID_L(RotateSpeed1,closed_loop_left_speed);
 		TIM2_CCR_R = PID_R(RotateSpeed2,closed_loop_right_speed);
-		
-		Set_PWM(TIM2_CCR_L,TIM2_CCR_R);                   //把新的CCR值设定到定时器2的第三通道
-		status = Tracks_GetStatus();
+		if(status == TRACKS_STRAIGHT || status == TRACKS_LOST || status == TRACKS_ELSE)
+		{
+			Motor_SetDirection(MOTOR_ALL,1);
+			Set_PWM(TIM2_CCR_L,TIM2_CCR_R);                   //把新的CCR值设定到定时器2的第三通道
+		}
+		else Tracks_Control(left_speed,right_speed);
 		TIM_ClearITPendingBit(TIM1, TIM_IT_Update);//清除TIMx的中断待处理位:TIM 中断源 
 
 	}

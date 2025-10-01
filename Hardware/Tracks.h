@@ -17,12 +17,12 @@
 #define TRACKS_CROSSROAD    4   // 十字路口标志
 #define TRACKS_LEFT_ANGLE   5   // 左直角弯标志
 #define TRACKS_RIGHT_ANGLE  6   // 右直角弯标志
-#define TRACKS_LOST         7   // 丢失轨迹标志
-#define ELSE         				0   // 未定义标志
+#define TRACKS_LOST         7   // 丢失轨迹标志 || 全白
+#define TRACKS_ELSE         0   // 未定义标志
 // 函数声明
 uint16_t Tracks_Read(void);             // 读取所有传感器状态
 uint8_t Tracks_GetStatus(void);  // 获取循迹状态
-int16_t Tracks_GetDeviation(void);  // 获取偏差值用于PID控制
+int Tracks_GetDeviation(void);  // 获取偏差值用于PID控制
 uint16_t Tracks_CheckAndCountBlackArea(void);  // 检测并计数黑区函数
 void Tracks_Control(int left_speed,int right_speed);  // 轨迹控制函数
 

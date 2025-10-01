@@ -816,7 +816,7 @@ I (.\System\Delay.h)(0x68D6181D)
 I (System\../Hardware/OLED.h)(0x68DA29EF)
 I (System\../Hardware/../System/GPIO.h)(0x68D8E7F5)
 F (.\System\Timer.h)(0x68D8BE6E)()
-F (.\System\SYS.c)(0x68DA2EB8)(--c99 -c --cpu Cortex-M3 -g -O1 --apcs=interwork --split_sections -I .\Start -I .\Library -I .\User -I .\System -I .\Hardware-ID:\FINE\keil5.24a\Packs\Keil\STM32F1xx_DFP\2.3.0\Device\Include-D__UVISION_VERSION="542" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\sys.o --omf_browse .\objects\sys.crf --depend .\objects\sys.d)
+F (.\System\SYS.c)(0x68DA543D)(--c99 -c --cpu Cortex-M3 -g -O1 --apcs=interwork --split_sections -I .\Start -I .\Library -I .\User -I .\System -I .\Hardware-ID:\FINE\keil5.24a\Packs\Keil\STM32F1xx_DFP\2.3.0\Device\Include-D__UVISION_VERSION="542" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\sys.o --omf_browse .\objects\sys.crf --depend .\objects\sys.d)
 I (System\SYS.h)(0x68D8F93A)
 I (.\Start\stm32f10x.h)(0x68D61818)
 I (.\Start\core_cm3.h)(0x68D61818)
@@ -854,7 +854,7 @@ I (.\System\Timer.h)(0x68D8BE6E)
 I (System\../Hardware/OLED.h)(0x68DA29EF)
 I (System\../Hardware/Key.h)(0x68D6181D)
 I (System\../Hardware/TB6612.h)(0x68D64299)
-I (System\../Hardware/Tracks.h)(0x68DA2CB3)
+I (System\../Hardware/Tracks.h)(0x68DA4F0B)
 I (D:\FINE\keil5.24a\ARM\ARMCC\include\stdio.h)(0x588B8344)
 I (System\../Hardware/UserTasks.h)(0x68D6181D)
 I (System\../Hardware/PID.h)(0x68D8FC62)
@@ -924,8 +924,8 @@ I (.\Library\misc.h)(0x68D61817)
 I (Hardware\OLED_Font.h)(0x68D61817)
 F (.\Hardware\OLED.h)(0x68DA29EF)()
 F (.\Hardware\OLED_Font.h)(0x68D61817)()
-F (.\Hardware\Tracks.c)(0x68DA2DBF)(--c99 -c --cpu Cortex-M3 -g -O1 --apcs=interwork --split_sections -I .\Start -I .\Library -I .\User -I .\System -I .\Hardware-ID:\FINE\keil5.24a\Packs\Keil\STM32F1xx_DFP\2.3.0\Device\Include-D__UVISION_VERSION="542" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\tracks.o --omf_browse .\objects\tracks.crf --depend .\objects\tracks.d)
-I (Hardware\Tracks.h)(0x68DA2CB3)
+F (.\Hardware\Tracks.c)(0x68DA51E0)(--c99 -c --cpu Cortex-M3 -g -O1 --apcs=interwork --split_sections -I .\Start -I .\Library -I .\User -I .\System -I .\Hardware-ID:\FINE\keil5.24a\Packs\Keil\STM32F1xx_DFP\2.3.0\Device\Include-D__UVISION_VERSION="542" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\tracks.o --omf_browse .\objects\tracks.crf --depend .\objects\tracks.d)
+I (Hardware\Tracks.h)(0x68DA4F0B)
 I (.\Start\stm32f10x.h)(0x68D61818)
 I (.\Start\core_cm3.h)(0x68D61818)
 I (D:\FINE\keil5.24a\ARM\ARMCC\include\stdint.h)(0x588B8344)
@@ -962,7 +962,7 @@ I (.\Hardware\Encoder.h)(0x68D8BE4C)
 I (.\System\Timer.h)(0x68D8BE6E)
 I (Hardware\../System/../Hardware/OLED.h)(0x68DA29EF)
 I (D:\FINE\keil5.24a\ARM\ARMCC\include\stdio.h)(0x588B8344)
-F (.\Hardware\Tracks.h)(0x68DA2CB3)()
+F (.\Hardware\Tracks.h)(0x68DA4F0B)()
 F (.\Hardware\Encoder.c)(0x68D8E81E)(--c99 -c --cpu Cortex-M3 -g -O1 --apcs=interwork --split_sections -I .\Start -I .\Library -I .\User -I .\System -I .\Hardware-ID:\FINE\keil5.24a\Packs\Keil\STM32F1xx_DFP\2.3.0\Device\Include-D__UVISION_VERSION="542" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\encoder.o --omf_browse .\objects\encoder.crf --depend .\objects\encoder.d)
 I (Hardware\Encoder.h)(0x68D8BE4C)
 I (.\Start\stm32f10x.h)(0x68D61818)
@@ -999,7 +999,7 @@ I (.\System\../Hardware/OLED.h)(0x68DA29EF)
 I (.\System\../Hardware/../System/GPIO.h)(0x68D8E7F5)
 I (.\System\Delay.h)(0x68D6181D)
 F (.\Hardware\Encoder.h)(0x68D8BE4C)()
-F (.\Hardware\TB6612.c)(0x68D8E96C)(--c99 -c --cpu Cortex-M3 -g -O1 --apcs=interwork --split_sections -I .\Start -I .\Library -I .\User -I .\System -I .\Hardware-ID:\FINE\keil5.24a\Packs\Keil\STM32F1xx_DFP\2.3.0\Device\Include-D__UVISION_VERSION="542" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\tb6612.o --omf_browse .\objects\tb6612.crf --depend .\objects\tb6612.d)
+F (.\Hardware\TB6612.c)(0x68DA52CE)(--c99 -c --cpu Cortex-M3 -g -O1 --apcs=interwork --split_sections -I .\Start -I .\Library -I .\User -I .\System -I .\Hardware-ID:\FINE\keil5.24a\Packs\Keil\STM32F1xx_DFP\2.3.0\Device\Include-D__UVISION_VERSION="542" -DSTM32F10X_MD -DUSE_STDPERIPH_DRIVER-o .\objects\tb6612.o --omf_browse .\objects\tb6612.crf --depend .\objects\tb6612.d)
 I (Hardware\TB6612.h)(0x68D64299)
 I (.\Start\stm32f10x.h)(0x68D61818)
 I (.\Start\core_cm3.h)(0x68D61818)
@@ -1174,7 +1174,7 @@ I (.\Hardware\Encoder.h)(0x68D8BE4C)
 I (.\System\../Hardware/OLED.h)(0x68DA29EF)
 I (.\System\../Hardware/Key.h)(0x68D6181D)
 I (.\System\../Hardware/TB6612.h)(0x68D64299)
-I (.\System\../Hardware/Tracks.h)(0x68DA2CB3)
+I (.\System\../Hardware/Tracks.h)(0x68DA4F0B)
 I (D:\FINE\keil5.24a\ARM\ARMCC\include\stdio.h)(0x588B8344)
 I (.\System\../Hardware/UserTasks.h)(0x68D6181D)
 I (.\System\../Hardware/PID.h)(0x68D8FC62)

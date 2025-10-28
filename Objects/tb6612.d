@@ -31,3 +31,7 @@
 .\objects\tb6612.o: .\Library\misc.h
 .\objects\tb6612.o: Hardware\../System/GPIO.h
 .\objects\tb6612.o: Hardware\../System/Timer.h
+.\objects\tb6612.o: .\Hardware\Encoder.h
+.\objects\tb6612.o: .\System\Timer.h
+.\objects\tb6612.o: .\System\Delay.h
+.\objects\tb6612.o: Hardware\../System/../Hardware/OLED.h

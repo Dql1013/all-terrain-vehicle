@@ -29,6 +29,7 @@
 */
 #include "TB6612.h"
 
+
 /**
   * 函    数：TB6612初始化
   * 参    数：无
@@ -42,9 +43,7 @@ void TB6612_Init(void)
     
     // 初始化时停止所有电机
     Motor_Stop();
-    
-    // 初始化PWM（通过System/Timer.c中的Timer2_PWM_Init函数）
-    // 注意：PWM初始化已在Timer_All_Init中完成，这里不再重复初始化
+
 }
 
 /**
@@ -123,9 +122,9 @@ void Motor_Backward(int left_speed, int right_speed)
   */
 void Motor_LeftTurn(uint16_t speed)
 {
-    Motor_SetDirection(MOTOR_LEFT, 0);   // 左电机停止
+    Motor_SetDirection(MOTOR_LEFT, 2);   // 左电机停止
     Motor_SetDirection(MOTOR_RIGHT, 1);  // 右电机前进
-    Set_PWM(0, speed);                    // 设置PWM占空比：左轮0，右轮9000
+    Set_PWM(speed, speed);                    // 设置PWM占空比：左轮0，右轮9000
 }
 
 /**
@@ -137,8 +136,8 @@ void Motor_LeftTurn(uint16_t speed)
 void Motor_RightTurn(uint16_t speed)
 {
     Motor_SetDirection(MOTOR_LEFT, 1);   // 左电机前进
-    Motor_SetDirection(MOTOR_RIGHT, 0);  // 右电机停止
-    Set_PWM(speed, 0);                    // 设置PWM占空比：左轮9000，右轮0
+    Motor_SetDirection(MOTOR_RIGHT, 2);  // 右电机停止
+    Set_PWM(speed, speed);                    // 设置PWM占空比：左轮9000，右轮0
 }
 
 /**
@@ -154,3 +153,32 @@ void Motor_Stop(void)
     // 关闭PWM输出
     Set_PWM(0, 0);
 }
+
+/**
+  * 函    数：小车左转90度
+  * 参    数：无
+  * 返 回 值：无
+  * 功    能：控制小车向左转90度
+  */
+void Motor_LeftTurn_90(void)
+{
+    Motor_LeftTurn(500);
+//		Delay_ms(600);
+//		Motor_Stop();
+//		Delay_ms(100);
+}
+
+/**
+  * 函    数：小车右转90度
+  * 参    数：无
+  * 返 回 值：无
+  * 功    能：控制小车向右转90度
+  */
+void Motor_RightTurn_90(void)
+{
+		Motor_RightTurn(500);
+//		Delay_ms(600);
+//		Motor_Stop();
+//		Delay_ms(100);
+}
+

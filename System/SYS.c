@@ -19,58 +19,17 @@
 
 #include "SYS.h"
 
-// 全局变量定义
-uint16_t CrossAndBlackAreaCount = 0;  // 黑区计数变量
-uint8_t MAP_count = 0;                // 地图计数
-uint8_t FIND_Flag = 0;                // 查找标志
+int16_t encoder_left,encoder_right;
+float RotateSpeed1,RotateSpeed2;       //定义编码器转速变量（单位：圈/S）
 
-// 路径控制相关变量
-uint8_t case_0 = 0;
-uint8_t case_1 = 0;
-uint8_t case_2 = 0;
-uint8_t case_3 = 0;
-uint8_t case_4 = 0;
-uint8_t case_5 = 0;
-uint8_t case_6 = 0;
-uint8_t case_7 = 0;
-uint8_t case_8 = 0;
-uint8_t case_9 = 0;
-uint8_t case_10 = 0;
-uint8_t case_11 = 0;
-uint8_t case_12 = 0;
-uint8_t case_13 = 0;
-uint8_t case_14 = 0;
-uint8_t case_15 = 0;
-uint8_t case_16 = 0;
-uint8_t case_17 = 0;
-uint8_t case_18 = 0;
-
+int16_t CrossAndBlackAreaCount = 0;  // 黑区计数变量
+int weighted_sum = 0;  						// 传感器状态
 // 电机速度参数
-uint8_t left_speed = 85;
-uint8_t right_speed = 85;
+int16_t left_speed = 500 , right_speed = 500;
+int16_t closed_loop_left_speed = 4 , closed_loop_right_speed = 4;
+int16_t TIM2_CCR_L=0,TIM2_CCR_R=0;   //PWM比较值
 
-/**
-  * 函    数：更新计数器函数
-  * 参    数：无
-  * 返 回 值：无
-  * 功    能：更新计数状态
-  */
-void Update_Counter(void)
-{
-    // 此处可以添加计数器更新的具体逻辑
-}
-
-/**
-  * 函    数：查找路径函数
-  * 参    数：无
-  * 返 回 值：无
-  * 功    能：控制小车寻找路径
-  */
-void Find(void)
-{
-    Tracks_Control(left_speed, right_speed);
-}
-
+uint8_t status ,status_L;
 /**
   * 函    数：系统全局初始化
   * 参    数：无
@@ -80,23 +39,17 @@ void Find(void)
 void STM32_System_Init(void)
 {
     // 初始化GPIO引脚
-    GPIO_All_Init();
+    GPIO_All_Init();	
+												// 循迹传感器初始化
+												// 用户任务初始化
     
     // 初始化定时器
     Timer_All_Init();
     
     // 初始化Hardware外设
-//    LED_Init();         // LED初始化
-//    Key_Init();         // 按键初始化
-//    Encoder_Init();     // 编码器初始化
+    Encoder_Init();     // 编码器初始化
     TB6612_Init();      // 电机驱动初始化
-//    OLED_Init();        // OLED显示初始化
-    // 在STM32_System_Init函数中取消注释
-    Tracks_Init();      // 循迹传感器初始化
-//    UserTasks_Init();   // 用户任务初始化
-    
-    // 系统初始化完成，点亮LED1作为指示
-//    LED1_ON();
+    OLED_Init();        // OLED显示初始化
 }
 
 /**
@@ -107,64 +60,10 @@ void STM32_System_Init(void)
   */
 void haixinbei(void)
 {
+	oled_show();
 	
-  //伸腿
-
-//	Motor3_Control(MOTOR3_EXTEND);
-	Motor_Forward(400,400);
-////	Delay_ms(1000);
-//	Car_Stop();
-//  static uint8_t haixinbei_flag = 0;
-//  if(haixinbei_flag == 0)
-//  {
-//    haixinbei_flag = 1;
-//    Motor3_TimeControl();
-//  }
+	Tracks_CheckAndCountBlackArea();
 	
-  // 直接在haixinbei函数中实现循迹功能
-  // 读取传感器状态
-  uint16_t tracks_value = Tracks_Read();
-  
-  // 判断循迹状态
-  uint8_t status = Tracks_GetStatus(tracks_value);
-  
-  // 根据状态控制电机
-  switch(status)
-  {
-      case TRACKS_STRAIGHT:
-          // 直线行驶
-          Motor_Forward(5000, 5000);
-          break;
-      case TRACKS_LEFT_TURN://怎么识别不出来
-          // 左转 - 左轮停，右轮转
-//          Motor_RightTurn(9000);
-		  Motor_Forward(0, 0);
-          break;
-      case TRACKS_RIGHT_TURN:
-          // 右转 - 右轮停，左轮转
-          Motor_LeftTurn(9000);
-          break;
-      case TRACKS_CROSSROAD:
-          // 十字路口，可以根据需要处理
-          Motor_Forward(5000, 5000);
-          break;
-      case TRACKS_LEFT_ANGLE:
-          // 左直角弯
-          Motor_LeftTurn(9000);
-          break;
-      case TRACKS_RIGHT_ANGLE:
-          // 右直角弯
-          Motor_RightTurn(9000);
-          break;
-      case TRACKS_LOST:
-          // 丢失轨迹，停止或执行找回操作
-          Motor_Stop();
-          break;
-      default:
-          // 默认直行
-          Motor_Forward(5000, 5000);
-          break;
-  }
 	
 	/*
 	Update_Counter();
@@ -248,34 +147,63 @@ void oled_show(void)
 {
     // 显示系统状态信息
     uint16_t tracks_value = Tracks_Read();
-    int16_t encoder_left = Encoder_GetCount(ENCODER_LEFT);
-    int16_t encoder_right = Encoder_GetCount(ENCODER_RIGHT);
-    
-    OLED_Clear();
+    status = Tracks_GetStatus();
+//    OLED_Clear();
     OLED_ShowString(1, 1, "Tracks:");
     OLED_ShowBinNum(1, 8, tracks_value, 8);
     
-    OLED_ShowString(2, 1, "Left En:");
-    OLED_ShowSignedNum(2, 9, encoder_left, 5);
+    OLED_ShowString(2, 1, "L_En:");
+    OLED_ShowSignedNum(2, 6, RotateSpeed1, 2);
     
-    OLED_ShowString(3, 1, "Right En:");
-    OLED_ShowSignedNum(3, 9, encoder_right, 5);
-    
-    OLED_ShowString(4, 1, "Status:");
-    uint8_t status = Tracks_GetStatus(tracks_value);
+    OLED_ShowString(2, 9, "R_En:");
+    OLED_ShowSignedNum(2, 14, RotateSpeed2, 2);
+    OLED_ShowSignedNum(3, 1, CrossAndBlackAreaCount, 2);
+	
+//    OLED_ShowSignedNum(3, 6, weighted_sum, 3);
+//	
+//		OLED_ShowSignedNum(3, 12, status, 2);
+		
+		OLED_ShowNum(3,5,TIM_GetCapture3(TIM2),4);   //显示占空比
+		OLED_ShowNum(3,11,TIM_GetCapture4(TIM2),4);   //显示占空比
+		if(status != status_L) OLED_PartClear(6);
     switch(status)
     {
-        case TRACKS_STRAIGHT: OLED_ShowString(4, 8, "STRAIGHT"); break;
-        case TRACKS_LEFT_TURN: OLED_ShowString(4, 8, "LEFT"); break;
-        case TRACKS_RIGHT_TURN: OLED_ShowString(4, 8, "RIGHT"); break;
-        case TRACKS_CROSSROAD: OLED_ShowString(4, 8, "CROSS"); break;
-        case TRACKS_LEFT_ANGLE: OLED_ShowString(4, 8, "L-ANGLE"); break;
-        case TRACKS_RIGHT_ANGLE: OLED_ShowString(4, 8, "R-ANGLE"); break;
-        case TRACKS_LOST: OLED_ShowString(4, 8, "LOST"); break;
+        case TRACKS_STRAIGHT:			OLED_ShowString(4, 1, "STRAIGHT"); 		break;
+        case TRACKS_LEFT_TURN:		OLED_ShowString(4, 1, "LEFT"); 				break;
+        case TRACKS_RIGHT_TURN:		OLED_ShowString(4, 1, "RIGHT"); 			break;
+        case TRACKS_CROSSROAD:		OLED_ShowString(4, 1, "CROSSROAD"); 	break;
+			  case TRACKS_LOST:					OLED_ShowString(4, 1, "LOST"); 				break;
+        case TRACKS_LEFT_ANGLE:		OLED_ShowString(4, 1, "L-ANGLE"); 		break;
+        case TRACKS_RIGHT_ANGLE:	OLED_ShowString(4, 1, "R-ANGLE"); 		break;
+				case TRACKS_ELSE:					OLED_ShowString(4, 1, "ELSE"); 				break;
     }
+		status_L = status;
+		
 }
 
+void TIM1_UP_IRQHandler(void) 
+{ 	    	  	     
+	if (TIM_GetITStatus(TIM1, TIM_IT_Update) != RESET)//检查指定的TIM中断发生与否:TIM 中断源 
+	{
+		encoder_left = Encoder_GetCount_Left();							//每隔固定时间段读取一次第一路编码器计数增量值
+		encoder_right = Encoder_GetCount_Right();						//每隔固定时间段读取一次第二路编码器计数增量值
+		// 计算转速（圈/S） = (脉冲数/采样周期) / (编码器每转脉冲数*4) * 1
+		// 乘以4是因为使用了TIM_EncoderMode_TI12模式
+		RotateSpeed1 = (encoder_left  / SAMPLE_PERIOD) / (ENCODER_PPR );
+		RotateSpeed2 = (encoder_right / SAMPLE_PERIOD) / (ENCODER_PPR );
 
+		TIM2_CCR_L = PID_L(RotateSpeed1,closed_loop_left_speed);
+		TIM2_CCR_R = PID_R(RotateSpeed2,closed_loop_right_speed);
+		if(status == TRACKS_STRAIGHT || status == TRACKS_LOST || status == TRACKS_ELSE)
+		{
+			Motor_SetDirection(MOTOR_ALL,1);
+			Set_PWM(TIM2_CCR_L,TIM2_CCR_R);                   //把新的CCR值设定到定时器2的第三通道
+		}
+		else Tracks_Control(left_speed,right_speed);
+		TIM_ClearITPendingBit(TIM1, TIM_IT_Update);//清除TIMx的中断待处理位:TIM 中断源 
+
+	}
+}
 
 
 

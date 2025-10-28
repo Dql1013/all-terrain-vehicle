@@ -31,4 +31,7 @@
 .\objects\usertasks.o: .\Library\misc.h
 .\objects\usertasks.o: Hardware\../System/GPIO.h
 .\objects\usertasks.o: Hardware\../System/Timer.h
+.\objects\usertasks.o: .\Hardware\Encoder.h
+.\objects\usertasks.o: .\System\Timer.h
 .\objects\usertasks.o: .\System\Delay.h
+.\objects\usertasks.o: Hardware\../System/../Hardware/OLED.h

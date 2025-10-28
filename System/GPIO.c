@@ -18,21 +18,29 @@
 #include "GPIO.h"
 
 /**
-  * 函    数：LED引脚初始化
+  * 函    数：OLED引脚初始化
   * 参    数：无
   * 返 回 值：无
   */
-void GPIO_LED_Init(void)
+void GPIO_OLED_Init(void)
 {
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-    
-    GPIO_InitTypeDef GPIO_InitStructure;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-    GPIO_InitStructure.GPIO_Pin = LED1_PIN | LED2_PIN;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(LED_PORT, &GPIO_InitStructure);
-    
-    GPIO_SetBits(LED_PORT, LED1_PIN | LED2_PIN);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOC, ENABLE);
+	
+	GPIO_InitTypeDef GPIO_InitStructure;
+ 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; 
+	
+	GPIO_InitStructure.GPIO_Pin = OLED_RES | OLED_D0 | OLED_D1 ;
+  GPIO_Init(OLED_PORT_C, &GPIO_InitStructure);
+
+	GPIO_InitStructure.GPIO_Pin = OLED_DC | OLED_CS ;
+  GPIO_Init(OLED_PORT, &GPIO_InitStructure);
+		
+	OLED_W_D0(0);
+	OLED_W_D1(1);
+	OLED_W_RES(1);
+	OLED_W_DC(1);
+	OLED_W_CS(1);
 }
 
 /**
@@ -46,7 +54,7 @@ void GPIO_Key_Init(void)
     
     GPIO_InitTypeDef GPIO_InitStructure;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-    GPIO_InitStructure.GPIO_Pin = KEY1_PIN | KEY2_PIN;
+    GPIO_InitStructure.GPIO_Pin = KEY_PIN ;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(KEY_PORT, &GPIO_InitStructure);
 }
@@ -66,12 +74,12 @@ void GPIO_TB6612_Init(void)
                                   TB6612_BIN1_PIN | TB6612_BIN2_PIN;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(GPIOB, &GPIO_InitStructure);
+    GPIO_Init(TB6612_IN_PORT, &GPIO_InitStructure);
 	
 	    // 设置PWM引脚 PA2, PA3
     GPIO_InitStructure.GPIO_Pin = TB6612_PWMA | TB6612_PWMB;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-    GPIO_Init(GPIOA, &GPIO_InitStructure);
+    GPIO_Init(TB6612_PWM, &GPIO_InitStructure);
    
 }
 
@@ -82,19 +90,24 @@ void GPIO_TB6612_Init(void)
   */
 void GPIO_Encoder_Init(void)
 {
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);			//开启GPIOA的时钟
     
-    GPIO_InitTypeDef GPIO_InitStructure;
-    
-    // 左编码器
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-    GPIO_InitStructure.GPIO_Pin = ENCODER_A_LEFT | ENCODER_B_LEFT;
-    GPIO_Init(ENCODER_PORT_LEFT, &GPIO_InitStructure);
-    
-    // 右编码器
-    GPIO_InitStructure.GPIO_Pin = ENCODER_A_RIGHT | ENCODER_B_RIGHT;
-    GPIO_Init(ENCODER_PORT_RIGHT, &GPIO_InitStructure);
-}
+			/*GPIO初始化*/
+		GPIO_InitTypeDef GPIO_InitStructure;
+		GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+		GPIO_InitStructure.GPIO_Pin = ENCODER_A_LEFT | ENCODER_B_LEFT;
+		GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+		GPIO_Init(GPIOA, &GPIO_InitStructure);						//将PA6和PA7引脚初始化为上拉输入
+
+		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);			//开启GPIOB的时钟
+	/*GPIO初始化*/
+//	GPIO_InitTypeDef GPIO_InitStructure;
+		GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
+		GPIO_InitStructure.GPIO_Pin = ENCODER_A_RIGHT | ENCODER_B_RIGHT;
+		GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+		GPIO_Init(GPIOB, &GPIO_InitStructure);						//将PB6和PB7引脚初始化为上拉输入
+	
+	}
 
 /**
   * 函    数：红外寻迹模块引脚初始化
@@ -105,39 +118,27 @@ void GPIO_Tracks_Init(void)
 {
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB, ENABLE);
     
+    // 禁用JTAG功能，将PB3设置为普通GPIO
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+    GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
+    //下拉PA12，
     GPIO_InitTypeDef GPIO_InitStructure;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//    GPIO_Init(GPIOA, &GPIO_InitStructure);
+    
     
     // 寻迹传感器PA端口
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-    GPIO_InitStructure.GPIO_Pin = TRACKS_PIN_1 | TRACKS_PIN_2 | TRACKS_PIN_3 | 
-                                  TRACKS_PIN_4 | TRACKS_PIN_5 | TRACKS_PIN_6;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
+    GPIO_InitStructure.GPIO_Pin = TRACKS_PIN_1 | TRACKS_PIN_2 | TRACKS_PIN_3 | TRACKS_PIN_4 ;
     GPIO_Init(TRACKS_PORT, &GPIO_InitStructure);
     
     // 寻迹传感器PB端口
-    GPIO_InitStructure.GPIO_Pin = TRACKS_PIN_7 | TRACKS_PIN_8;
+    GPIO_InitStructure.GPIO_Pin = TRACKS_PIN_5 | TRACKS_PIN_6 | TRACKS_PIN_7 | TRACKS_PIN_8;
     GPIO_Init(TRACKS_PORT_B, &GPIO_InitStructure);
 }
 
-/**
-  * 函    数：OLED引脚初始化
-  * 参    数：无
-  * 返 回 值：无
-  */
-void GPIO_OLED_Init(void)
-{
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
-    
-    GPIO_InitTypeDef GPIO_InitStructure;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Pin = OLED_SCL_PIN;  // 使用更新后的宏定义
-    GPIO_Init(OLED_PORT, &GPIO_InitStructure);
-    GPIO_InitStructure.GPIO_Pin = OLED_SDA_PIN;  // 使用更新后的宏定义
-    GPIO_Init(OLED_PORT, &GPIO_InitStructure);
-    
-    GPIO_SetBits(OLED_PORT, OLED_SCL_PIN);
-    GPIO_SetBits(OLED_PORT, OLED_SDA_PIN);
-}
 
 /**
   * 函    数：伸缩电机引脚初始化
@@ -153,9 +154,6 @@ void GPIO_Motor3_Init(void)
     GPIO_InitStructure.GPIO_Pin = MOTOR3_PIN_PLUS ;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(MOTOR3_PORT, &GPIO_InitStructure);
-    
-    // 初始化默认值为停止状态
-//    GPIO_SetBits(MOTOR3_PORT, MOTOR3_PIN_PLUS | MOTOR3_PIN_MINUS);
 }
 
 /**
@@ -165,12 +163,11 @@ void GPIO_Motor3_Init(void)
   */
 void GPIO_All_Init(void)
 {
-    GPIO_LED_Init();
+		GPIO_OLED_Init();
     GPIO_Key_Init();
     GPIO_TB6612_Init();
-//    GPIO_Encoder_Init();
-//    GPIO_Tracks_Init();
-//    GPIO_OLED_Init();
+    GPIO_Encoder_Init();
+    GPIO_Tracks_Init();
     GPIO_Motor3_Init(); // 添加伸缩电机初始化
 }
 

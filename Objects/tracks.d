@@ -33,3 +33,7 @@
 .\objects\tracks.o: .\System\Delay.h
 .\objects\tracks.o: Hardware\TB6612.h
 .\objects\tracks.o: Hardware\../System/Timer.h
+.\objects\tracks.o: .\Hardware\Encoder.h
+.\objects\tracks.o: .\System\Timer.h
+.\objects\tracks.o: Hardware\../System/../Hardware/OLED.h
+.\objects\tracks.o: D:\FINE\keil5.24a\ARM\ARMCC\Bin\..\include\stdio.h

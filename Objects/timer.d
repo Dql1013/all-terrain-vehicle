@@ -29,3 +29,8 @@
 .\objects\timer.o: .\Library\stm32f10x_usart.h
 .\objects\timer.o: .\Library\stm32f10x_wwdg.h
 .\objects\timer.o: .\Library\misc.h
+.\objects\timer.o: .\Hardware\Encoder.h
+.\objects\timer.o: .\System\Timer.h
+.\objects\timer.o: .\System\Delay.h
+.\objects\timer.o: System\../Hardware/OLED.h
+.\objects\timer.o: System\../Hardware/../System/GPIO.h

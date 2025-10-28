@@ -32,8 +32,12 @@
 .\objects\sys.o: System\Delay.h
 .\objects\sys.o: System\GPIO.h
 .\objects\sys.o: System\Timer.h
-.\objects\sys.o: System\../Hardware/Encoder.h
-.\objects\sys.o: System\../Hardware/TB6612.h
+.\objects\sys.o: .\Hardware\Encoder.h
+.\objects\sys.o: .\System\Timer.h
 .\objects\sys.o: System\../Hardware/OLED.h
+.\objects\sys.o: System\../Hardware/Key.h
+.\objects\sys.o: System\../Hardware/TB6612.h
 .\objects\sys.o: System\../Hardware/Tracks.h
+.\objects\sys.o: D:\FINE\keil5.24a\ARM\ARMCC\Bin\..\include\stdio.h
 .\objects\sys.o: System\../Hardware/UserTasks.h
+.\objects\sys.o: System\../Hardware/PID.h

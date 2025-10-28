@@ -1,4 +1,6 @@
 .\objects\oled.o: Hardware\OLED.c
+.\objects\oled.o: Hardware\OLED.h
+.\objects\oled.o: Hardware\../System/GPIO.h
 .\objects\oled.o: .\Start\stm32f10x.h
 .\objects\oled.o: .\Start\core_cm3.h
 .\objects\oled.o: D:\FINE\keil5.24a\ARM\ARMCC\Bin\..\include\stdint.h

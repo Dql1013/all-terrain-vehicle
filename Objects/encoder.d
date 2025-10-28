@@ -30,4 +30,7 @@
 .\objects\encoder.o: .\Library\stm32f10x_wwdg.h
 .\objects\encoder.o: .\Library\misc.h
 .\objects\encoder.o: .\System\Timer.h
+.\objects\encoder.o: .\Hardware\Encoder.h
+.\objects\encoder.o: .\System\../Hardware/OLED.h
+.\objects\encoder.o: .\System\../Hardware/../System/GPIO.h
 .\objects\encoder.o: .\System\Delay.h

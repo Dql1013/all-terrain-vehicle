@@ -43,7 +43,8 @@
 ├── Library/         # STM32标准库
 ├── Start/           # 启动文件和系统配置
 ├── Project.uvprojx  # Keil项目文件
-└── README.md        # 项目说明文档
+├── README.md        # 项目说明文档
+└──适用于吉林省大学生人工智能创新大赛全地形小车的主控板2.0_Gerber_PCB.zip #PCB制作文件
 ```
 
 ## 主要模块说明

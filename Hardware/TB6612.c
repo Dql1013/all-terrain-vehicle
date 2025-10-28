@@ -15,6 +15,7 @@
 *********************************************************************************************************
 */
 /*
+可以更改的地方（因车而异）（都在最下面）
 		Motor_Forward (left_speed , right_speed)
 		Motor_Backward(left_speed , right_speed)
 		Motor_LeftTurn (speed)

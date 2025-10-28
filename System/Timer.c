@@ -34,8 +34,8 @@ void Timer_All_Init(void)
 {
   
     // 初始化PWM定时器(1kHz频率，更适合电机控制)
-    Timer2_PWM_Init(999, 71);
-    
+    Timer2_PWM_Init(3333, 71);//适用于MG540
+//    Timer2_PWM_Init(999, 71);//适用于MG530
     // 初始化编码器定时器，用于闭环控制提高扭矩稳定性
     Timer3_Encoder_Init();
     Timer4_Encoder_Init();
@@ -146,7 +146,7 @@ void Timer3_Encoder_Init(void)
 	TIM_ICInit(TIM3, &TIM_ICInitStructure);					//将结构体变量交给TIM_ICInit，配置TIM3的输入捕获通道
 	
 	/*编码器接口配置*/
-	TIM_EncoderInterfaceConfig(TIM3, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising, TIM_ICPolarity_Rising);
+	TIM_EncoderInterfaceConfig(TIM3, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising, TIM_ICPolarity_Falling);
 											//配置编码器模式以及两个输入通道是否反相
 											//注意此时参数的Rising和Falling已经不代表上升沿和下降沿了，而是代表是否反相
 											//此函数必须在输入捕获初始化之后进行，否则输入捕获的配置会覆盖此函数的部分配置
@@ -187,7 +187,7 @@ void Timer4_Encoder_Init(void)
 	TIM_ICInit(TIM4, &TIM_ICInitStructure);					//将结构体变量交给TIM_ICInit，配置TIM4的输入捕获通道
 	
 	/*编码器接口配置*/
-	TIM_EncoderInterfaceConfig(TIM4, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising, TIM_ICPolarity_Falling);
+	TIM_EncoderInterfaceConfig(TIM4, TIM_EncoderMode_TI12, TIM_ICPolarity_Falling, TIM_ICPolarity_Falling);
 											//配置编码器模式以及两个输入通道是否反相
 											//注意此时参数的Rising和Falling已经不代表上升沿和下降沿了，而是代表是否反相
 											//此函数必须在输入捕获初始化之后进行，否则输入捕获的配置会覆盖此函数的部分配置
